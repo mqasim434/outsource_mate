@@ -9,7 +9,7 @@ class RotatedButton extends StatelessWidget {
     required this.label,
   });
 
-  final String label;
+  final UserRoles label;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class RotatedButton extends StatelessWidget {
                   )),
         child: RotatedBox(
           quarterTurns: -1,
-          child: Center(child: Text(label)),
+          child: Center(child: Text(label.name)),
         ),
       ),
     );

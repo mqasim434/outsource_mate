@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:outsource_mate/providers/splash_provider.dart';
 import 'package:outsource_mate/res/myColors.dart';
+import 'package:outsource_mate/utils/routes_names.dart';
+import 'package:provider/provider.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -8,6 +11,9 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+    final splashProvider = SplashProvider(function: (){
+      Navigator.pushNamed(context, RouteName.signupScreen);
+    });
     return Scaffold(
       body: SafeArea(
         child: Column(

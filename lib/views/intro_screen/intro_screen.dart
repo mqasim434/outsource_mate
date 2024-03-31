@@ -17,66 +17,65 @@ class _IntroScreenState extends State<IntroScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 20.0,
-            vertical: 50,
-          ),
-          child: Stack(
-            children: [
-              PageView(
-                controller: pageController,
-                onPageChanged: (value) {
-                  setState(() {
-                    pageNumber = value;
-                  });
-                },
-                scrollDirection: Axis.horizontal,
-                children: [
-                  IntroPage(
-                    title: 'Task Assignment',
-                    text:
-                        'Simplify your workload by seamlessly assigning tasks to your team members, and gain real-time insights into their progress, ensuring every project stays on track',
-                    img: 'assets/vectors/task_assignment.jpg',
-                  ),
-                  IntroPage(
-                    title: 'Task Assignment',
-                    text:
-                        'Simplify your workload by seamlessly assigning tasks to your team members, and gain real-time insights into their progress, ensuring every project stays on track',
-                    img: 'assets/vectors/revenue.jpg',
-                  ),
-                  IntroPage(
-                    title: 'Task Assignment',
-                    text:
-                        'Simplify your workload by seamlessly assigning tasks to your team members, and gain real-time insights into their progress, ensuring every project stays on track',
-                    img: 'assets/vectors/time_mgt.jpg',
-                  ),
-                ],
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 80.0),
-                  child: ThreeDots(
-                    pageIndex: pageNumber,
-                  ),
+        child: Stack(
+          children: [
+            PageView(
+              controller: pageController,
+              onPageChanged: (value) {
+                setState(() {
+                  pageNumber = value;
+                });
+              },
+              scrollDirection: Axis.horizontal,
+              children: [
+                IntroPage(
+                  title: 'Task Assignment',
+                  text:
+                      'Simplify your workload by seamlessly assigning tasks to your team members, and gain real-time insights into their progress, ensuring every project stays on track',
+                  img: 'assets/vectors/task_assignment.jpg',
+                ),
+                IntroPage(
+                  title: 'Task Assignment',
+                  text:
+                      'Simplify your workload by seamlessly assigning tasks to your team members, and gain real-time insights into their progress, ensuring every project stays on track',
+                  img: 'assets/vectors/revenue.jpg',
+                ),
+                IntroPage(
+                  title: 'Task Assignment',
+                  text:
+                      'Simplify your workload by seamlessly assigning tasks to your team members, and gain real-time insights into their progress, ensuring every project stays on track',
+                  img: 'assets/vectors/time_mgt.jpg',
+                ),
+              ],
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 120.0),
+                child: ThreeDots(
+                  pageIndex: pageNumber,
                 ),
               ),
-              Align(
-                alignment: Alignment.bottomCenter,
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  right: 20.0,
+                  left: 20.0,
+                  bottom: 50,
+                ),
                 child: RoundedRectangularButton(
                   buttonText: 'Get Started',
                   onPress: () {
-                    Navigator.pushNamed(context, RouteName.dashboardScreen);
+                    Navigator.pushNamed(context, RouteName.dashboard);
                   },
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
       ),
     );

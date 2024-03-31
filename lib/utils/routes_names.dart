@@ -8,7 +8,7 @@ class RouteName{
 
   static const String introScreen = 'intro';
 
-  static const String dashboardScreen = 'dashboard';
+  static const String dashboard = 'dashboard';
 
   static const String projectsScreen = 'projects';
 
@@ -19,6 +19,8 @@ class RouteName{
   static const String moreScreen = 'more';
 
   static const String teamScreen = 'team';
+
+  static const String profileScreen = 'profile';
 
   static const String numberInputScreen = 'numberInput';
 

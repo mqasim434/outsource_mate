@@ -15,36 +15,41 @@ class IntroPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Image.asset(img.toString()),
-        //text
-        Column(
-          children: [
-            Text(
-              title.toString(),
-              style: const TextStyle(
-                color: MyColors.blackTextColor,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20.0,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Image.asset(img.toString()),
+          //text
+          Column(
+            children: [
+              Text(
+                title.toString(),
+                style: const TextStyle(
+                  color: MyColors.blackTextColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Text(
-              text.toString(),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: MyColors.blackTextColor,
-                fontSize: 14,
+              const SizedBox(
+                height: 20,
               ),
-            ),
-          ],
-        ),
-        const SizedBox(),
-      ],
+              Text(
+                text.toString(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: MyColors.blackTextColor,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(),
+        ],
+      ),
     );
   }
 }

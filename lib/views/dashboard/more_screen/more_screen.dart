@@ -1,6 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:outsource_mate/res/components/toffee.dart';
-import 'package:outsource_mate/res/myColors.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 
 class MoreScreen extends StatelessWidget {
@@ -27,20 +26,25 @@ class MoreScreen extends StatelessWidget {
             MoreScreenButtonWidget(
               label: 'Profile',
               icon: const Icon(Icons.person),
-              onTap: (){},
+              onTap: () {
+                Navigator.pushNamed(context, RouteName.profileScreen);
+              },
             ),
             MoreScreenButtonWidget(
               label: 'Team',
               icon: const Icon(Icons.people),
-              onTap: (){
+              onTap: () {
                 Navigator.pushNamed(context, RouteName.teamScreen);
               },
             ),
             MoreScreenButtonWidget(
               label: 'Logout',
               icon: const Icon(Icons.logout),
-              onTap: (){
-
+              onTap: () {
+                FirebaseAuth.instance.signOut().then((value) {
+                  Navigator.pushNamedAndRemoveUntil(context,
+                      RouteName.signinScreen, (route) => route.isFirst);
+                });
               },
             ),
           ],
@@ -51,8 +55,12 @@ class MoreScreen extends StatelessWidget {
 }
 
 class MoreScreenButtonWidget extends StatelessWidget {
-  const MoreScreenButtonWidget(
-      {super.key, required this.label, required this.icon,required this.onTap,});
+  const MoreScreenButtonWidget({
+    super.key,
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
 
   final String label;
   final Icon icon;

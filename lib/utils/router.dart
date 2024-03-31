@@ -4,6 +4,7 @@ import 'package:outsource_mate/views/dashboard/chat_screen/chat_screen.dart';
 import 'package:outsource_mate/views/dashboard/chat_screen/inbox_screen.dart';
 import 'package:outsource_mate/views/dashboard/dashboard.dart';
 import 'package:outsource_mate/views/dashboard/more_screen/more_screen.dart';
+import 'package:outsource_mate/views/dashboard/more_screen/profile_screen.dart';
 import 'package:outsource_mate/views/dashboard/more_screen/team_screen.dart';
 import 'package:outsource_mate/views/dashboard/projects_screen.dart';
 import 'package:outsource_mate/views/intro_screen/intro_screen.dart';
@@ -24,6 +25,11 @@ class Routes {
           builder: (_) => const SplashScreen(),
         );
 
+        case RouteName.introScreen:
+        return MaterialPageRoute(
+          builder: (_) => const IntroScreen(),
+        );
+
       case RouteName.signupScreen:
         return MaterialPageRoute(
           builder: (_) => const SignupScreen(),
@@ -39,7 +45,7 @@ class Routes {
           builder: (_) => const IntroScreen(),
         );
 
-      case RouteName.dashboardScreen:
+      case RouteName.dashboard:
         return MaterialPageRoute(
           builder: (_) => const Dashboard(),
         );
@@ -67,6 +73,11 @@ class Routes {
       case RouteName.teamScreen:
         return MaterialPageRoute(
           builder: (_) => const TeamScreen(),
+        );
+
+      case RouteName.profileScreen:
+        return MaterialPageRoute(
+          builder: (_) => const ProfileScreen(),
         );
 
       case RouteName.numberInputScreen:

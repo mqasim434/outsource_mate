@@ -1,6 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:outsource_mate/models/user_model.dart';
-import 'package:outsource_mate/providers/user_provider.dart';
+import 'package:outsource_mate/providers/employee_provider.dart';
 import 'package:outsource_mate/res/components/my_text_field.dart';
 import 'package:outsource_mate/res/components/rounded_rectangular_button.dart';
 import 'package:outsource_mate/res/myColors.dart';
@@ -11,7 +12,7 @@ class TeamScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
+    final employeeProvider = Provider.of<EmployeeProvider>(context);
     final nameController = TextEditingController();
     final emailController = TextEditingController();
     final phoneController = TextEditingController();
@@ -29,18 +30,31 @@ class TeamScreen extends StatelessWidget {
           ),
           elevation: 0,
         ),
-        body: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-            ),
-            itemCount: userProvider.usersList.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: TeamMemberWidget(
-                  userModel: userProvider.usersList[index],
-                ),
-              );
+        body: StreamBuilder(
+            stream:
+                FirebaseFirestore.instance.collection('employees').snapshots(),
+            builder: (context, snapshot) {
+              return snapshot.connectionState == ConnectionState.waiting
+                  ? Center(child: const CircularProgressIndicator())
+                  : snapshot.data!.docs.isEmpty
+                      ? const Center(
+                          child: Text('No Employee Yet'),
+                        )
+                      : GridView.builder(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                          ),
+                          itemCount: snapshot.data!.size,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: TeamMemberWidget(
+                                employeeModel: EmployeeModel.fromJson(
+                                    snapshot.data!.docs[index].data()),
+                              ),
+                            );
+                          });
             }),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -120,18 +134,19 @@ class TeamScreen extends StatelessWidget {
                             hintText: 'Enter Employee Role',
                           ),
                           const SizedBox(
-                            height: 10,
+                            height: 40,
                           ),
                           RoundedRectangularButton(
                             buttonText: 'Add Employee',
                             onPress: () {
-                              UserModel newEmployee = UserModel(
+                              EmployeeModel newEmployee = EmployeeModel(
                                 name: nameController.text,
                                 email: emailController.text,
                                 phone: phoneController.text,
-                                role: roleController.text,
+                                position: roleController.text,
                               );
-                              userProvider.addNewEmployee(newEmployee);
+                              employeeProvider.createEmployee(
+                                  newEmployee, context);
                               showDialog(
                                   context: context,
                                   builder: (context) {
@@ -157,17 +172,15 @@ class TeamScreen extends StatelessWidget {
 }
 
 class TeamMemberWidget extends StatelessWidget {
-  const TeamMemberWidget({
-    super.key,
-    required this.userModel
-  });
+  const TeamMemberWidget({super.key, required this.employeeModel});
 
-  final UserModel userModel;
+  final EmployeeModel employeeModel;
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+    print(employeeModel.empId);
     return Container(
       width: screenWidth * 0.45,
       height: screenHeight * 0.25,
@@ -192,7 +205,7 @@ class TeamMemberWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  userModel.name.toString(),
+                  employeeModel.name.toString(),
                   style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -200,7 +213,7 @@ class TeamMemberWidget extends StatelessWidget {
                       fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  userModel.role.toString(),
+                  employeeModel.position.toString(),
                   style: const TextStyle(
                       color: Colors.white,
                       fontSize: 12,
@@ -217,7 +230,9 @@ class TeamMemberWidget extends StatelessWidget {
                     size: 10,
                   ),
                 ),
-                SizedBox(width: 5,),
+                SizedBox(
+                  width: 5,
+                ),
                 CircleAvatar(
                   radius: 10,
                   child: Icon(

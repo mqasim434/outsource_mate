@@ -1,17 +1,22 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:outsource_mate/models/user_model.dart';
+import 'package:outsource_mate/providers/signin_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:outsource_mate/utils/routes_names.dart';
 
 class SignupProvider with ChangeNotifier{
 
-  // Change Sign in Role
-  String currentRoleSelected = 'FREELANCER';
+  UserRoles currentRoleSelected = UserRoles.FREELANCER;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  void changeRole(String role){
+  void changeRole(UserRoles role){
     currentRoleSelected = role;
     notifyListeners();
   }
 
-
-  // Toggle Password Visibility
   bool _isVisible = true;
   bool get isVisible => _isVisible;
 
@@ -20,5 +25,51 @@ class SignupProvider with ChangeNotifier{
     notifyListeners();
   }
 
+  Future<void> signupWithEmail(String email,String password,BuildContext context) async {
+    try {
+      EasyLoading.show(status: 'Creating Account');
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      saveUserInDatabase(userCredential).then((value){
+        print('Successfully signed up: ${userCredential.user!.uid}');
+        EasyLoading.dismiss();
+        Navigator.pushNamed(context, RouteName.dashboard);
+      });
+    }catch (e) {
+      EasyLoading.dismiss();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error creating account: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> saveUserInDatabase(UserCredential userCredential)async{
+    if(currentRoleSelected==UserRoles.FREELANCER){
+      final freelancer = FreelancerModel(
+        email: userCredential.user!.email,
+      );
+      final jsonData = freelancer.toJson();
+      _firestore.collection('freelancers').add(jsonData).then((value){
+        print('Freelancer added with ID: ${value.id}');
+      }).catchError((e){
+        print('Error adding Freelancer: $e');
+      });
+    } else if(currentRoleSelected==UserRoles.CLIENT){
+      final client = ClientModel(
+        email: userCredential.user!.email,
+      );
+      final jsonData = client.toJson();
+      _firestore.collection('clients').add(jsonData).then((value){
+        print('Client added with ID: ${value.id}');
+      }).catchError((e){
+        print('Error adding client: $e');
+      });
+    }
+  }
 
 }

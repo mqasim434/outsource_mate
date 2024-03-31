@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:outsource_mate/models/project_model.dart';
 import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/project_provider.dart';
-import 'package:outsource_mate/providers/user_provider.dart';
+import 'package:outsource_mate/providers/employee_provider.dart';
+import 'package:outsource_mate/providers/signin_provider.dart';
 import 'package:outsource_mate/res/components/my_text_field.dart';
 import 'package:outsource_mate/res/components/project_widget.dart';
 import 'package:outsource_mate/res/components/rounded_rectangular_button.dart';
@@ -17,7 +18,8 @@ class DashboardScreen extends StatelessWidget {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     final projectProvider = Provider.of<ProjectProvider>(context);
-    final userProvider = Provider.of<UserProvider>(context);
+    final employeeProvider = Provider.of<EmployeeProvider>(context);
+    final signinProvider = Provider.of<SigninProvider>(context);
     final titleController = TextEditingController();
     final descriptionController = TextEditingController();
     final deadlineController = TextEditingController();
@@ -141,7 +143,7 @@ class DashboardScreen extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: signinProvider.currentRoleSelected==''?FloatingActionButton(
         backgroundColor: MyColors.pinkColor,
         onPressed: () {
           showModalBottomSheet(
@@ -221,7 +223,7 @@ class DashboardScreen extends StatelessWidget {
                               padding: const EdgeInsets.only(right: 10.0),
                               child: DropdownButton(
                                 underline: Container(),
-                                items: userProvider.usersList.map((user) {
+                                items: employeeProvider.employeeList.map((user) {
                                   return DropdownMenuItem(
                                     value: user.name,
                                     child: Text(user.name ?? ''),
@@ -314,7 +316,7 @@ class DashboardScreen extends StatelessWidget {
           );
         },
         child: const Icon(Icons.add_box_rounded),
-      ),
+      ):const SizedBox(),
     );
   }
 }

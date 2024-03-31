@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:outsource_mate/providers/signin_provider.dart';
-import 'package:outsource_mate/res/components/my_text_field.dart';
 import 'package:outsource_mate/res/components/rotated_button.dart';
-import 'package:outsource_mate/res/components/rounded_icon_button.dart';
 import 'package:outsource_mate/res/myColors.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
-import 'package:outsource_mate/views/registration_screens/signup_screen.dart';
 import 'package:provider/provider.dart';
 
 class SigninScreen extends StatelessWidget {
@@ -15,7 +12,10 @@ class SigninScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-    final isKeyboard = MediaQuery.of(context).viewInsets.bottom != 0;
+
+    final emailController = TextEditingController();
+    final empIdController = TextEditingController();
+    final passwordController = TextEditingController();
 
     final signinProvider = Provider.of<SigninProvider>(context);
 
@@ -32,11 +32,11 @@ class SigninScreen extends StatelessWidget {
                 children: [
                   const Column(
                     children: [
-                      RotatedButton(label: 'FREELANCER'),
+                      RotatedButton(label: UserRoles.FREELANCER),
                       SizedBox(height: 20,),
-                      RotatedButton(label: 'EMPLOYEE'),
+                      RotatedButton(label: UserRoles.EMPLOYEE),
                       SizedBox(height: 20,),
-                      RotatedButton(label: 'CLIENT'),
+                      RotatedButton(label: UserRoles.CLIENT),
                     ],
                   ),
                   Container(
@@ -73,10 +73,11 @@ class SigninScreen extends StatelessWidget {
                             child: Column(
                               children: [
                                 (signinProvider.currentRoleSelected ==
-                                            'FREELANCER' ||
+                                            UserRoles.FREELANCER ||
                                         signinProvider.currentRoleSelected ==
-                                            'CLIENT')
+                                            UserRoles.CLIENT)
                                     ? TextFormField(
+                                  controller: emailController,
                                         decoration: InputDecoration(
                                           hintText: 'Enter your Email',
                                           contentPadding:
@@ -88,6 +89,7 @@ class SigninScreen extends StatelessWidget {
                                         ),
                                       )
                                     : TextFormField(
+                                  controller: empIdController,
                                         decoration: InputDecoration(
                                           hintText: 'Enter your Employee ID',
                                           contentPadding:
@@ -102,6 +104,7 @@ class SigninScreen extends StatelessWidget {
                                   height: 10,
                                 ),
                                 TextFormField(
+                                  controller: passwordController,
                                   decoration: InputDecoration(
                                       hintText: 'Enter your password',
                                       contentPadding: const EdgeInsets.symmetric(
@@ -169,9 +172,13 @@ class SigninScreen extends StatelessWidget {
                               ),
                             ),
                             onPressed: () {
-                              Navigator.pushNamed(context, RouteName.dashboardScreen);
+                              if(signinProvider.currentRoleSelected==UserRoles.FREELANCER || signinProvider.currentRoleSelected==UserRoles.EMPLOYEE){
+                                signinProvider.signinWithEmail(emailController.text, passwordController.text,context);
+                              }else{
+
+                              }
                             },
-                            child: const Text('Sign in'),
+                            child: const Text('Sign in',style: TextStyle(color: Colors.white),),
                           ),
                         ],
                       ),

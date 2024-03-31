@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyD4oXm1YCy9tizFiigPby2k_itsgKo8JqQ</string>
+	<key>GCM_SENDER_ID</key>
+	<string>997871305049</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.shopifyistic.outsourceMate</string>
+	<key>PROJECT_ID</key>
+	<string>outsource-mate-f4c50</string>
+	<key>STORAGE_BUCKET</key>
+	<string>outsource-mate-f4c50.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:997871305049:ios:c3b9fa1eccc61562e5cc48</string>
+</dict>
+</plist>
