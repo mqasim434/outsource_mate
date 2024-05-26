@@ -19,11 +19,11 @@ class Dashboard extends StatelessWidget {
           body: PageView(
             controller: bottomNavbarProvider.controller,
             physics: const NeverScrollableScrollPhysics(),
-            children: const [
-              DashboardScreen(),
+            children: [
+              const DashboardScreen(),
               ProjectsScreen(),
-              InboxScreen(),
-              MoreScreen(),
+              const InboxScreen(),
+              const MoreScreen(),
             ],
           ),
           bottomNavigationBar: MyNavBar(

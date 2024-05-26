@@ -27,4 +27,6 @@ class RouteName{
   static const String otpInputScreen = 'otpInput';
 
   static const String newPasswordScreen = 'newPassword';
+
+  static const String projectDetailsScreen = 'projectDetails';
 }

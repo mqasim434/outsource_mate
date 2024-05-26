@@ -5,10 +5,12 @@ class MessageWidget extends StatelessWidget {
   MessageWidget({
     super.key,
     required this.messageText,
+    required this.time,
     this.isSender = true,
   });
 
   String? messageText;
+  String? time;
   bool isSender;
 
   @override
@@ -30,24 +32,35 @@ class MessageWidget extends StatelessWidget {
                 )
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 8),
               child: Text(
                 messageText.toString(),
                 style: const TextStyle(
-                  fontSize: 24,
+                  fontSize: 18,
                 ),
               ),
             ),
           ),
-          Row(
+          isSender?Row(
             mainAxisAlignment:
-            isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
-            children: const [
-              Text('12:12 PM'),
-              SizedBox(
+            MainAxisAlignment.end,
+            children: [
+              Text(time.toString()),
+              const SizedBox(
                 width: 5,
               ),
-              Icon(Icons.check)
+              const Icon(Icons.check)
+            ],
+          ):Row(
+            mainAxisAlignment:
+            MainAxisAlignment.start,
+            children: [
+              const Icon(Icons.check),
+
+              const SizedBox(
+                width: 5,
+              ),
+              Text(time.toString()),
             ],
           )
         ],

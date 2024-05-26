@@ -1,15 +1,73 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:outsource_mate/models/project_model.dart';
+import 'package:outsource_mate/models/user_model.dart';
+import 'package:outsource_mate/providers/signin_provider.dart';
 
-class ProjectProvider extends ChangeNotifier{
+class ProjectProvider extends ChangeNotifier {
+  List<ProjectModel> _projectsList = [];
 
-  void addProject(ProjectModel project){
-    projectsList.add(project);
+  List<ProjectModel> get projectsList => _projectsList;
+
+  void getProjects(String email, String collection) async {
+    print("Getting Projects");
+    EasyLoading.show(status: 'Fetching Projects');
+    final DocumentSnapshot result = await FirebaseFirestore.instance
+        .collection(collection)
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get()
+        .then((querySnapshot) => querySnapshot.docs.first);
+
+    if (!result.exists) {
+      EasyLoading.dismiss();
+      return null;
+    } else {
+      final Map<String, dynamic> userData = result.data() as Map<String, dynamic>;
+      final List<dynamic> projectsData = userData['projects'] ?? [];
+      final List<ProjectModel> projects = projectsData.map((projectData) => ProjectModel.fromJson(projectData)).toList();
+      _projectsList = projects;
+    }
+    EasyLoading.dismiss();
     notifyListeners();
   }
 
-  int getProjectsTypeCount(String type){
-    var filteredProjects = projectsList.where((element){
+  String getCollectionName(String userRole){
+    if(userRole==UserRoles.FREELANCER.name){
+      return 'freelancers';
+    }else if(userRole==UserRoles.CLIENT.name){
+      return 'clients';
+    }
+    else if(userRole==UserRoles.EMPLOYEE.name){
+      return 'employees';
+    }else{
+      return 'N/A';
+    }
+  }
+  void addProject(ProjectModel project) async{
+    final QuerySnapshot result = await FirebaseFirestore.instance
+        .collection(getCollectionName(UserModel.currentUser.userType))
+        .where('email', isEqualTo: UserModel.currentUser.email)
+        .limit(1)
+        .get();
+
+    if (result.docs.isEmpty) {
+      throw Exception('User not found');
+    }
+
+    final DocumentSnapshot document = result.docs.first;
+    final Map<String, dynamic> userData = document.data() as Map<String, dynamic>;
+    final List<dynamic> projects = userData['projects'] ?? [];
+    projects.add(project.toJson());
+
+    await document.reference.update({
+      'projects': projects,
+    });
+  }
+
+  int getProjectsTypeCount(String type) {
+    var filteredProjects = _projectsList.where((element) {
       return (element.projectStatus == type);
     });
 
@@ -17,50 +75,11 @@ class ProjectProvider extends ChangeNotifier{
   }
 
 
-  List<ProjectModel> projectsList = [
-    ProjectModel(
-      projectTitle: 'Project 1',
-      projectDescription: 'Description for Project 1',
-      employeeName: 'John Doe',
-      startingTime: '2024-03-01T08:00:00',
-      deadline: '2024-03-10T08:00:00',
-      projectStatus: 'In Progress',
-    ),
-    ProjectModel(
-      projectTitle: 'Project 2',
-      projectDescription: 'Description for Project 2',
-      employeeName: 'Alice Smith',
-      startingTime: '2024-03-02T08:00:00',
-      deadline: '2024-03-11T08:00:00',
-      projectStatus: 'In Revision',
-    ),
-    ProjectModel(
-      projectTitle: 'Project 3',
-      projectDescription: 'Description for Project 3',
-      employeeName: 'Bob Johnson',
-      startingTime: '2024-03-03T08:00:00',
-      deadline: '2024-03-12T08:00:00',
-      projectStatus: 'Completed',
-    ),
-    ProjectModel(
-      projectTitle: 'Project 4',
-      projectDescription: 'Description for Project 4',
-      employeeName: 'Emily Brown',
-      startingTime: '2024-03-04T08:00:00',
-      deadline: '2024-03-13T08:00:00',
-      projectStatus: 'Cancelled',
-    ),
-    ProjectModel(
-      projectTitle: 'Project 5',
-      projectDescription: 'Description for Project 5',
-      employeeName: 'Michael Wilson',
-      startingTime: '2024-03-05T08:00:00',
-      deadline: '2024-03-14T08:00:00',
-      projectStatus: 'In Progress',
-    ),
-  ];
 
+  int selectedProjectIndex = -1;
 
-
-
+  void updateIndex(int index){
+    selectedProjectIndex = index;
+    notifyListeners();
+  }
 }

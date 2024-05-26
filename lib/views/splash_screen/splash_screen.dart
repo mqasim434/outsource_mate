@@ -1,19 +1,86 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:outsource_mate/providers/splash_provider.dart';
+import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/res/myColors.dart';
+import 'package:outsource_mate/utils/login_session_manager.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  Future<dynamic> fetchUserByEmail(String email,String collection) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection(collection)
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isEmpty) {
+      return null;
+    }
+
+    DocumentSnapshot userDoc = querySnapshot.docs.first;
+    print('Data: ${userDoc.data().toString()}');
+    if(collection=="clients"){
+      return ClientModel.fromJson(userDoc.data() as Map<String, dynamic>);
+    }
+    else if(collection=="freelancers"){
+      return FreelancerModel.fromJson(userDoc.data() as Map<String, dynamic>);
+    }
+    else{
+      return EmployeeModel.fromJson(userDoc.data() as Map<String, dynamic>);
+    }
+
+  }
+  Future<Map<String,String>?> getDataFromSharedPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String,String> data = {
+      'email':  prefs.getString('email').toString(),
+      'collection':  prefs.getString('collection').toString(),
+    };
+    return data;
+  }
+  @override
+  void initState(){
+    LoginSessionManager.getUserSession().then((value){
+      Future.delayed(const Duration(seconds: 3),(){
+        if(value==null){
+          Navigator.pushNamed(context, RouteName.signinScreen);
+        }else{
+          // getDataFromSharedPrefs().then((data){
+          //   if(data!=null){
+          //     fetchUserByEmail(data['email'].toString(), data['collection'].toString()).then((user){
+          //       UserModel.currentUser = user;
+          //     });
+          //
+          //     setState(() {
+          //
+          //     });
+          //   }
+          // }).then((value){
+          //   Navigator.pushNamed(context, RouteName.dashboard);
+          // });
+          Navigator.pushNamed(context, RouteName.signinScreen);
+        }
+
+      });
+    });
+    // Future.delayed(const Duration(seconds: 3),(){
+    //   Navigator.pushNamed(context, RouteName.signinScreen);
+    // });
+
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-    final splashProvider = SplashProvider(function: (){
-      Navigator.pushNamed(context, RouteName.signupScreen);
-    });
     return Scaffold(
       body: SafeArea(
         child: Column(

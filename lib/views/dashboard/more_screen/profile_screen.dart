@@ -9,18 +9,20 @@ import 'package:outsource_mate/providers/signin_provider.dart';
 import 'package:outsource_mate/res/components/rounded_rectangular_button.dart';
 import 'package:outsource_mate/res/myColors.dart';
 import 'package:provider/provider.dart';
-
+// Ignoring the lint rule
+// ignore_for_file: use_key_in_widget_constructors
+// ignore_for_file: prefer_const_constructors
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  ProfileScreen({super.key});
+
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-
-    TextEditingController nameController = TextEditingController();
-    TextEditingController emailController = TextEditingController();
-    TextEditingController phoneController = TextEditingController();
 
     return SafeArea(
       child: Scaffold(

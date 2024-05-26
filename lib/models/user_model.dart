@@ -1,19 +1,29 @@
 import 'dart:math';
 
+import 'package:outsource_mate/models/project_model.dart';
+
 class UserModel {
   String? name;
   String? email;
   String? phone;
   String? imageUrl;
+  String? userType;
+  bool? isOnline;
+  bool? isTyping;
+  String? lastSeen;
+  List<ProjectModel>? projects;
   UserModel({
     this.name,
     this.email,
     this.phone,
     this.imageUrl,
+    this.userType,
+    this.isOnline,
+    this.isTyping,
+    this.lastSeen,
+    this.projects,
   });
-
   static dynamic currentUser;
-
 }
 
 class EmployeeModel extends UserModel {
@@ -25,9 +35,16 @@ class EmployeeModel extends UserModel {
     super.name,
     super.email,
     super.phone,
+    super.projects,
+    super.userType,
+    super.imageUrl,
+    super.isOnline,
+    super.isTyping,
+    super.lastSeen,
     this.position,
     this.password,
-  }){
+    this.empId,
+  }) {
     empId = _generateEmployeeId();
     password = empId;
   }
@@ -40,6 +57,11 @@ class EmployeeModel extends UserModel {
     empId = json['empId'];
     password = json['password'];
     imageUrl = json['imageUrl'];
+    projects = projects;
+    userType = json['userType'];
+    isOnline = json['isOnline'];
+    isTyping = json['isTyping'];
+    lastSeen = json['lastSeen'];
   }
 
   Map<String, dynamic> toJson() {
@@ -50,6 +72,11 @@ class EmployeeModel extends UserModel {
     data['position'] = position;
     data['empId'] = empId;
     data['imageUrl'] = imageUrl;
+    projects = projects;
+    data['userType'] = userType;
+    data['isOnline'] = isOnline;
+    data['isTyping'] = isTyping;
+    data['lastSeen'] = lastSeen;
     return data;
   }
 
@@ -59,19 +86,29 @@ class EmployeeModel extends UserModel {
   }
 }
 
-
 class FreelancerModel extends UserModel {
   FreelancerModel({
     super.name,
     super.email,
     super.phone,
     super.imageUrl,
+    super.userType,
+    super.isOnline,
+    super.isTyping,
+    super.lastSeen,
+    super.projects,
   });
 
   FreelancerModel.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     email = json['email'];
     phone = json['phone'];
+    imageUrl = json['imageUrl'];
+    userType = json['userType'];
+    isOnline = json['isOnline'];
+    isTyping = json['isTyping'];
+    lastSeen = json['lastSeen'];
+    projects = projects;
   }
 
   Map<String, dynamic> toJson() {
@@ -79,6 +116,12 @@ class FreelancerModel extends UserModel {
     data['name'] = name;
     data['email'] = email;
     data['phone'] = phone;
+    data['imageUrl'] = imageUrl;
+    data['userType'] = userType;
+    data['isOnline'] = isOnline;
+    data['isTyping'] = isTyping;
+    data['lastSeen'] = lastSeen;
+    projects = projects;
     return data;
   }
 }
@@ -89,12 +132,23 @@ class ClientModel extends UserModel {
     super.email,
     super.phone,
     super.imageUrl,
+    super.userType,
+    super.isOnline,
+    super.isTyping,
+    super.lastSeen,
+    super.projects,
   });
 
   ClientModel.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     email = json['email'];
     phone = json['phone'];
+    imageUrl = json['imageUrl'];
+    userType = json['userType'];
+    isOnline = json['isOnline'];
+    isTyping = json['isTyping'];
+    lastSeen = json['lastSeen'];
+    projects = projects;
   }
 
   Map<String, dynamic> toJson() {
@@ -102,7 +156,12 @@ class ClientModel extends UserModel {
     data['name'] = name;
     data['email'] = email;
     data['phone'] = phone;
+    data['imageUrl'] = imageUrl;
+    data['userType'] = userType;
+    data['isOnline'] = isOnline;
+    data['isTyping'] = isTyping;
+    data['lastSeen'] = lastSeen;
+    projects = projects;
     return data;
   }
-
 }

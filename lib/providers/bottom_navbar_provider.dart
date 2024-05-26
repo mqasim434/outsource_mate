@@ -12,4 +12,13 @@ class BottomNavbarProvider extends ChangeNotifier{
     controller.animateToPage(index, duration: const Duration(milliseconds: 1), curve: Curves.easeInOut,);
     notifyListeners();
   }
+
+  String? _selectedLabel = 'Home';
+
+  String? get selectedLabel => _selectedLabel;
+
+  void changeSelectedLabel(String? label){
+    _selectedLabel = label;
+    notifyListeners();
+  }
 }

@@ -2,9 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/employee_provider.dart';
+import 'package:outsource_mate/providers/freelancersProvider.dart';
+import 'package:outsource_mate/providers/project_provider.dart';
 import 'package:outsource_mate/res/components/my_text_field.dart';
 import 'package:outsource_mate/res/components/rounded_rectangular_button.dart';
 import 'package:outsource_mate/res/myColors.dart';
+import 'package:outsource_mate/utils/utility_functions.dart';
 import 'package:provider/provider.dart';
 
 class TeamScreen extends StatelessWidget {
@@ -31,31 +34,33 @@ class TeamScreen extends StatelessWidget {
           elevation: 0,
         ),
         body: StreamBuilder(
-            stream:
-                FirebaseFirestore.instance.collection('employees').snapshots(),
-            builder: (context, snapshot) {
-              return snapshot.connectionState == ConnectionState.waiting
-                  ? Center(child: const CircularProgressIndicator())
-                  : snapshot.data!.docs.isEmpty
-                      ? const Center(
-                          child: Text('No Employee Yet'),
-                        )
-                      : GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                          ),
-                          itemCount: snapshot.data!.size,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: TeamMemberWidget(
-                                employeeModel: EmployeeModel.fromJson(
-                                    snapshot.data!.docs[index].data()),
-                              ),
-                            );
-                          });
-            }),
+          stream:
+              FirebaseFirestore.instance.collection('employees').snapshots(),
+          builder: (context, snapshot) {
+            return snapshot.connectionState == ConnectionState.waiting
+                ? const Center(child: CircularProgressIndicator())
+                : snapshot.data!.docs.isEmpty
+                    ? const Center(
+                        child: Text('No Employee Yet'),
+                      )
+                    : GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                        ),
+                        itemCount: snapshot.data!.size,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: TeamMemberWidget(
+                              employeeModel: EmployeeModel.fromJson(
+                                  snapshot.data!.docs[index].data()),
+                            ),
+                          );
+                        },
+                      );
+          },
+        ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             showModalBottomSheet(
@@ -171,16 +176,34 @@ class TeamScreen extends StatelessWidget {
   }
 }
 
-class TeamMemberWidget extends StatelessWidget {
+class TeamMemberWidget extends StatefulWidget {
   const TeamMemberWidget({super.key, required this.employeeModel});
-
   final EmployeeModel employeeModel;
+
+  @override
+  State<TeamMemberWidget> createState() => _TeamMemberWidgetState();
+}
+
+class _TeamMemberWidgetState extends State<TeamMemberWidget> {
+  ProjectProvider projectProvider = ProjectProvider();
+  FreelancersProvider freelancersProvider = FreelancersProvider();
+  @override
+  void initState() {
+    // TODO: implement initState
+    projectProvider = Provider.of<ProjectProvider>(context, listen: false);
+    projectProvider.getProjects(
+        UserModel.currentUser.email.toString(),
+        UtilityFunctions.getCollectionName(
+            UserModel.currentUser.userType.toString()));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    print(employeeModel.empId);
+
+    print(widget.employeeModel.empId);
     return Container(
       width: screenWidth * 0.45,
       height: screenHeight * 0.25,
@@ -205,7 +228,7 @@ class TeamMemberWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  employeeModel.name.toString(),
+                  widget.employeeModel.name.toString(),
                   style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -213,7 +236,7 @@ class TeamMemberWidget extends StatelessWidget {
                       fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  employeeModel.position.toString(),
+                  widget.employeeModel.position.toString(),
                   style: const TextStyle(
                       color: Colors.white,
                       fontSize: 12,
@@ -249,7 +272,49 @@ class TeamMemberWidget extends StatelessWidget {
               child: SizedBox(
                 height: 30,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Assign Project'),
+                            content: SizedBox(
+                              width: screenWidth * 0.8,
+                              height: 200,
+                              child: ListView.builder(
+                                  itemCount:
+                                      projectProvider.projectsList.length,
+                                  itemBuilder: (context, index) {
+                                    return Card(
+                                      child: ListTile(
+                                        title: Text(projectProvider
+                                            .projectsList[index].projectTitle
+                                            .toString()),
+                                        leading: Radio(
+                                          value: index,
+                                          groupValue: projectProvider.selectedProjectIndex,
+                                          onChanged: (value) {
+                                            print(value);
+                                            projectProvider.updateIndex(value as int);
+                                            setState(() {
+
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                            ),
+                            actions: [
+                              RoundedRectangularButton(buttonText: 'Assign', onPress: (){
+                                freelancersProvider.assignProjectToEmployee(widget.employeeModel.email.toString(), projectProvider.projectsList[projectProvider.selectedProjectIndex]).then((value){
+                                  Navigator.pop(context);
+                                });
+                              }),
+                            ],
+                          );
+                        });
+                  },
                   child: const Text('Assign Project'),
                 ),
               ),

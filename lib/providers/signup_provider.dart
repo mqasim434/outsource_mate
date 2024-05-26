@@ -49,10 +49,13 @@ class SignupProvider with ChangeNotifier{
   }
 
   Future<void> saveUserInDatabase(UserCredential userCredential)async{
+    print("Selected Role: $currentRoleSelected");
     if(currentRoleSelected==UserRoles.FREELANCER){
       final freelancer = FreelancerModel(
         email: userCredential.user!.email,
+        userType: UserRoles.FREELANCER.name,
       );
+
       final jsonData = freelancer.toJson();
       _firestore.collection('freelancers').add(jsonData).then((value){
         print('Freelancer added with ID: ${value.id}');
@@ -62,7 +65,9 @@ class SignupProvider with ChangeNotifier{
     } else if(currentRoleSelected==UserRoles.CLIENT){
       final client = ClientModel(
         email: userCredential.user!.email,
+        userType: UserRoles.CLIENT.name,
       );
+
       final jsonData = client.toJson();
       _firestore.collection('clients').add(jsonData).then((value){
         print('Client added with ID: ${value.id}');
@@ -70,6 +75,7 @@ class SignupProvider with ChangeNotifier{
         print('Error adding client: $e');
       });
     }
+    notifyListeners();
   }
 
 }

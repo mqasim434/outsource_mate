@@ -8,26 +8,22 @@ import 'package:outsource_mate/views/registration_screens/signin_screen.dart';
 import 'package:provider/provider.dart';
 
 class SignupScreen extends StatelessWidget {
-  const SignupScreen({super.key});
+  SignupScreen({super.key});
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    final emailController = TextEditingController();
-    final empIdController = TextEditingController();
-    final passwordController = TextEditingController();
-    final confirmPasswordController = TextEditingController();
-
     final signupProvider = Provider.of<SignupProvider>(context);
 
     return SafeArea(
       child: Scaffold(
         body: Container(
-          decoration: BoxDecoration(
-            gradient: MyColors.purplePinkGradient
-          ),
+          decoration: BoxDecoration(gradient: MyColors.purplePinkGradient),
           child: SingleChildScrollView(
             child: SizedBox(
               height: screenHeight,
@@ -37,11 +33,25 @@ class SignupScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      const Column(
+                      Column(
                         children: [
-                          RotatedButton(label: UserRoles.FREELANCER),
-                          SizedBox(height: 20,),
-                          RotatedButton(label: UserRoles.CLIENT),
+                          RotatedButton(
+                            label: UserRoles.FREELANCER,
+                            onTap: () {
+                              signupProvider.changeRole(UserRoles.FREELANCER);
+                            },
+                            page: 'signup',
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          RotatedButton(
+                            label: UserRoles.CLIENT,
+                            onTap: () {
+                              signupProvider.changeRole(UserRoles.CLIENT);
+                            },
+                            page: 'signup',
+                          ),
                         ],
                       ),
                       Container(
@@ -49,12 +59,12 @@ class SignupScreen extends StatelessWidget {
                         height: screenHeight * 0.9,
                         decoration: const BoxDecoration(
                           color: Colors.white,
-                          borderRadius:
-                          BorderRadius.only(bottomLeft: Radius.circular(100)),
+                          borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(100)),
                         ),
                         child: Padding(
-                          padding:
-                          const EdgeInsets.only(left: 20.0, right: 20, bottom: 20),
+                          padding: const EdgeInsets.only(
+                              left: 20.0, right: 20, bottom: 20),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
@@ -78,31 +88,36 @@ class SignupScreen extends StatelessWidget {
                                 child: Column(
                                   children: [
                                     signupProvider.currentRoleSelected ==
-                                        UserRoles.FREELANCER
+                                            UserRoles.FREELANCER
                                         ? TextFormField(
-                                      controller: emailController,
-                                      decoration: InputDecoration(
-                                        hintText: 'Enter your Email',
-                                        contentPadding:
-                                        const EdgeInsets.symmetric(
-                                            vertical: 15, horizontal: 15),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(50),
-                                        ),
-                                      ),
-                                    )
+                                            controller: emailController,
+                                            decoration: InputDecoration(
+                                              hintText: 'Enter your Email',
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 15,
+                                                      horizontal: 15),
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                              ),
+                                            ),
+                                          )
                                         : TextFormField(
-                                      controller: empIdController,
-                                      decoration: InputDecoration(
-                                        hintText: 'Enter your Employee ID',
-                                        contentPadding:
-                                        const EdgeInsets.symmetric(
-                                            vertical: 15, horizontal: 15),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(50),
-                                        ),
-                                      ),
-                                    ),
+                                            controller: emailController,
+                                            decoration: InputDecoration(
+                                              hintText:
+                                                  'Enter your email',
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 15,
+                                                      horizontal: 15),
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                              ),
+                                            ),
+                                          ),
                                     const SizedBox(
                                       height: 10,
                                     ),
@@ -110,19 +125,25 @@ class SignupScreen extends StatelessWidget {
                                       controller: passwordController,
                                       decoration: InputDecoration(
                                           hintText: 'Enter your password',
-                                          contentPadding: const EdgeInsets.symmetric(
-                                              vertical: 15, horizontal: 15),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 15, horizontal: 15),
                                           border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(50),
+                                            borderRadius:
+                                                BorderRadius.circular(50),
                                           ),
                                           suffixIcon: InkWell(
-                                            onTap: (){
-                                              signupProvider.togglePasswordVisibility(!signupProvider.isVisible);
+                                            onTap: () {
+                                              signupProvider
+                                                  .togglePasswordVisibility(
+                                                      !signupProvider
+                                                          .isVisible);
                                             },
                                             child: Icon(
                                               signupProvider.isVisible
                                                   ? Icons.remove_red_eye
-                                                  : Icons.remove_red_eye_outlined,
+                                                  : Icons
+                                                      .remove_red_eye_outlined,
                                             ),
                                           )),
                                       obscureText: signupProvider.isVisible,
@@ -134,19 +155,25 @@ class SignupScreen extends StatelessWidget {
                                       controller: confirmPasswordController,
                                       decoration: InputDecoration(
                                           hintText: 'Confirm your password',
-                                          contentPadding: const EdgeInsets.symmetric(
-                                              vertical: 15, horizontal: 15),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 15, horizontal: 15),
                                           border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(50),
+                                            borderRadius:
+                                                BorderRadius.circular(50),
                                           ),
                                           suffixIcon: InkWell(
-                                            onTap: (){
-                                              signupProvider.togglePasswordVisibility(!signupProvider.isVisible);
+                                            onTap: () {
+                                              signupProvider
+                                                  .togglePasswordVisibility(
+                                                      !signupProvider
+                                                          .isVisible);
                                             },
                                             child: Icon(
                                               signupProvider.isVisible
                                                   ? Icons.remove_red_eye
-                                                  : Icons.remove_red_eye_outlined,
+                                                  : Icons
+                                                      .remove_red_eye_outlined,
                                             ),
                                           )),
                                       obscureText: signupProvider.isVisible,
@@ -155,12 +182,14 @@ class SignupScreen extends StatelessWidget {
                                       height: 15,
                                     ),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         const Text('Already have an account? '),
                                         InkWell(
                                           onTap: () {
-                                            Navigator.pushNamed(context, RouteName.signinScreen);
+                                            Navigator.pushNamed(context,
+                                                RouteName.signinScreen);
                                           },
                                           child: const Text(
                                             'Sign in',
@@ -184,9 +213,15 @@ class SignupScreen extends StatelessWidget {
                                   ),
                                 ),
                                 onPressed: () {
-                                  signupProvider.signupWithEmail(emailController.text, passwordController.text,context);
+                                  signupProvider.signupWithEmail(
+                                      emailController.text,
+                                      passwordController.text,
+                                      context);
                                 },
-                                child: const Text('Sign up',style: TextStyle(color: Colors.white),),
+                                child: const Text(
+                                  'Sign up',
+                                  style: TextStyle(color: Colors.white),
+                                ),
                               ),
                             ],
                           ),

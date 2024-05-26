@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:outsource_mate/models/project_model.dart';
+import 'package:outsource_mate/models/user_model.dart';
 
 class ProjectWidget extends StatelessWidget {
   const ProjectWidget({super.key,
-    required this.title,
-    required this.description,
-    required this.deadline,
-    required this.startingTime,
-    required this.employeeName,
+    required this.projectModel
   });
 
-  final String title;
-  final String description;
-  final String startingTime;
-  final String deadline;
-  final String employeeName;
+  final ProjectModel projectModel;
 
 
   @override
@@ -42,7 +36,7 @@ class ProjectWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
-              title,
+              projectModel.projectTitle.toString(),
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -52,15 +46,15 @@ class ProjectWidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Employee Name: ',
-                  style: TextStyle(
+                Text(
+                  UserModel.currentUser.userType=='CLIENT'?'Freelancer Name: ':UserModel.currentUser.userType=='FREELANCER'?'Employee Name':'Freelancer Name',
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  employeeName,
+                  projectModel.employeeName.toString(),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -79,7 +73,7 @@ class ProjectWidget extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  startingTime,
+                  projectModel.startingTime.toString(),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -98,7 +92,7 @@ class ProjectWidget extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  deadline,
+                  projectModel.deadline.toString(),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:outsource_mate/providers/nav_provider.dart';
+import 'package:outsource_mate/providers/bottom_navbar_provider.dart';
 import 'package:outsource_mate/res/myColors.dart';
 import 'package:provider/provider.dart';
 
@@ -43,7 +43,7 @@ class NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final navProvider = Provider.of<NavProvider>(context);
+    final navProvider = Provider.of<BottomNavbarProvider>(context);
     bool isSelected = navProvider.selectedLabel == label;
     return InkWell(
       onTap: () {

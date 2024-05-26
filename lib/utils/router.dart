@@ -8,13 +8,14 @@ import 'package:outsource_mate/views/dashboard/more_screen/profile_screen.dart';
 import 'package:outsource_mate/views/dashboard/more_screen/team_screen.dart';
 import 'package:outsource_mate/views/dashboard/projects_screen.dart';
 import 'package:outsource_mate/views/intro_screen/intro_screen.dart';
+import 'package:outsource_mate/views/project_screens/project_details.dart';
 import 'package:outsource_mate/views/registration_screens/forgot_screens/new_password_screen.dart';
 import 'package:outsource_mate/views/registration_screens/forgot_screens/number_input_screen.dart';
 import 'package:outsource_mate/views/registration_screens/forgot_screens/otp_input_screen.dart';
 import 'package:outsource_mate/views/registration_screens/signin_screen.dart';
 import 'package:outsource_mate/views/registration_screens/signup_screen.dart';
 import 'package:outsource_mate/views/splash_screen/splash_screen.dart';
-
+// ingore_for_file: prefer_const_constructors
 class Routes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final arguments = settings.arguments;
@@ -32,12 +33,12 @@ class Routes {
 
       case RouteName.signupScreen:
         return MaterialPageRoute(
-          builder: (_) => const SignupScreen(),
+          builder: (_) => SignupScreen(),
         );
 
       case RouteName.signinScreen:
         return MaterialPageRoute(
-          builder: (_) => const SigninScreen(),
+          builder: (_) => SigninScreen(),
         );
 
       case RouteName.introScreen:
@@ -52,12 +53,14 @@ class Routes {
 
       case RouteName.projectsScreen:
         return MaterialPageRoute(
-          builder: (_) => const ProjectsScreen(),
+          builder: (_) => ProjectsScreen(),
         );
 
       case RouteName.chatScreen:
+        Map<String, dynamic> data = arguments as Map<String, dynamic>;
+        dynamic otherUser = data['otherUser'];
         return MaterialPageRoute(
-          builder: (_) => const ChatScreen(),
+          builder: (_) => ChatScreen(otherUser: otherUser),
         );
 
       case RouteName.inboxScreen:
@@ -77,7 +80,7 @@ class Routes {
 
       case RouteName.profileScreen:
         return MaterialPageRoute(
-          builder: (_) => const ProfileScreen(),
+          builder: (_) => ProfileScreen(),
         );
 
       case RouteName.numberInputScreen:
@@ -93,6 +96,11 @@ class Routes {
       case RouteName.newPasswordScreen:
         return MaterialPageRoute(
           builder: (_) => const NewPasswordScreen(),
+        );
+
+        case RouteName.projectDetailsScreen:
+        return MaterialPageRoute(
+          builder: (_) => const ProjectDetailsScreen(),
         );
 
       default:

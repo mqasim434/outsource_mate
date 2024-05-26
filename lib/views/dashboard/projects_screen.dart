@@ -5,12 +5,26 @@ import 'package:outsource_mate/res/components/project_widget.dart';
 import 'package:outsource_mate/res/myColors.dart';
 import 'package:provider/provider.dart';
 
-class ProjectsScreen extends StatelessWidget {
-  const ProjectsScreen({super.key});
+class ProjectsScreen extends StatefulWidget {
+  ProjectsScreen({super.key});
+
+  @override
+  State<ProjectsScreen> createState() => _ProjectsScreenState();
+}
+
+class _ProjectsScreenState extends State<ProjectsScreen> {
+  ProjectProvider projectsProvider = ProjectProvider();
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    projectsProvider = Provider.of<ProjectProvider>(context,listen: false);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final projectProvider = Provider.of<ProjectProvider>(context);
     final filterProvider = Provider.of<ProjectsFilterWidgetProvider>(context);
     return SafeArea(
         child: Scaffold(
@@ -36,7 +50,7 @@ class ProjectsScreen extends StatelessWidget {
                 children: [
                   ProjectsFilterWidget(
                     label: 'In Progress',
-                    count: projectProvider
+                    count: projectsProvider
                         .getProjectsTypeCount('In Progress')
                         .toString(),
                   ),
@@ -45,7 +59,7 @@ class ProjectsScreen extends StatelessWidget {
                   ),
                   ProjectsFilterWidget(
                     label: 'In Revision',
-                    count: projectProvider
+                    count: projectsProvider
                         .getProjectsTypeCount('In Revision')
                         .toString(),
                   ),
@@ -54,7 +68,7 @@ class ProjectsScreen extends StatelessWidget {
                   ),
                   ProjectsFilterWidget(
                     label: 'Completed',
-                    count: projectProvider
+                    count: projectsProvider
                         .getProjectsTypeCount('Completed')
                         .toString(),
                   ),
@@ -63,7 +77,7 @@ class ProjectsScreen extends StatelessWidget {
                   ),
                   ProjectsFilterWidget(
                     label: 'Cancelled',
-                    count: projectProvider
+                    count: projectsProvider
                         .getProjectsTypeCount('Cancelled')
                         .toString(),
                   ),
@@ -73,19 +87,18 @@ class ProjectsScreen extends StatelessWidget {
           ),
           Expanded(
             child: ListView.builder(
-                itemCount: projectProvider.projectsList.where((element) => element.projectStatus==filterProvider.selectedLabel).length,
+                itemCount: projectsProvider.projectsList
+                    .where((element) =>
+                        element.projectStatus == filterProvider.selectedLabel)
+                    .length,
                 itemBuilder: (context, index) {
-                  final project = projectProvider.projectsList[index];
-                  if (projectProvider.projectsList.isNotEmpty) {
+                  final project = projectsProvider.projectsList[index];
+                  if (projectsProvider.projectsList.isNotEmpty) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20.0, vertical: 10),
                       child: ProjectWidget(
-                        title: project.projectTitle.toString(),
-                        description: project.deadline.toString(),
-                        employeeName: project.employeeName.toString(),
-                        startingTime: project.startingTime.toString(),
-                        deadline: project.deadline.toString(),
+                        projectModel: project,
                       ),
                     );
                   } else {
