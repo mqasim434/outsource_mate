@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:outsource_mate/models/project_model.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 import 'package:outsource_mate/views/dashboard/chat_screen/chat_screen.dart';
 import 'package:outsource_mate/views/dashboard/chat_screen/inbox_screen.dart';
@@ -6,6 +7,7 @@ import 'package:outsource_mate/views/dashboard/dashboard.dart';
 import 'package:outsource_mate/views/dashboard/more_screen/more_screen.dart';
 import 'package:outsource_mate/views/dashboard/more_screen/profile_screen.dart';
 import 'package:outsource_mate/views/dashboard/more_screen/team_screen.dart';
+import 'package:outsource_mate/views/dashboard/notifications_screen.dart';
 import 'package:outsource_mate/views/dashboard/projects_screen.dart';
 import 'package:outsource_mate/views/intro_screen/intro_screen.dart';
 import 'package:outsource_mate/views/project_screens/project_details.dart';
@@ -99,8 +101,15 @@ class Routes {
         );
 
         case RouteName.projectDetailsScreen:
+          Map<String, dynamic> data = arguments as Map<String, dynamic>;
+          ProjectModel project = data['project'] as ProjectModel;
         return MaterialPageRoute(
-          builder: (_) => const ProjectDetailsScreen(),
+          builder: (_) => ProjectDetailsScreen(project: project,),
+        );
+
+        case RouteName.notifications:
+        return MaterialPageRoute(
+          builder: (_) => NotificationsScreen(),
         );
 
       default:

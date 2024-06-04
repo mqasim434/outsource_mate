@@ -22,11 +22,14 @@ class ClientProvider extends ChangeNotifier{
   }
 
   Future<void> addProjectToFreelancerByEmail(String email, ProjectModel project) async {
+    print('HELLO');
+    print(email);
     Map<String,dynamic> projectData = project.toJson();
     try {
       QuerySnapshot querySnapshot = await _db.collection('freelancers').where('email', isEqualTo: email).get();
 
       if (querySnapshot.docs.isNotEmpty) {
+        print(project.toString());
         DocumentSnapshot freelancerDoc = querySnapshot.docs.first;
         List<dynamic> projects = freelancerDoc.get('projects') ?? [];
         projects.add(projectData);

@@ -7,6 +7,8 @@ class ProjectModel {
   String? startingTime;
   String? deadline;
   String? projectStatus;
+  List<Map<String,bool>>? modules;
+  String? fileUrl;
 
   ProjectModel(
       {this.projectTitle,
@@ -16,7 +18,10 @@ class ProjectModel {
       this.clientName,
       this.startingTime,
       this.deadline,
-      this.projectStatus});
+      this.projectStatus,
+      this.modules,
+      this.fileUrl,
+      });
 
   ProjectModel.fromJson(Map<String, dynamic> json) {
     projectTitle = json['projectTitle'];
@@ -27,6 +32,11 @@ class ProjectModel {
     startingTime = json['startingTime'];
     deadline = json['deadline'];
     projectStatus = json['projectStatus'];
+    modules = json['modules'] != null
+        ? List<Map<String, bool>>.from(
+        json['modules'].map((x) => Map<String, bool>.from(x))
+    ): null;
+    fileUrl = json['fileUrl'];
   }
 
   Map<String, dynamic> toJson() {
@@ -39,6 +49,8 @@ class ProjectModel {
     data['startingTime'] = startingTime;
     data['deadline'] = deadline;
     data['projectStatus'] = projectStatus;
+    data['modules'] = modules;
+    data['fileUrl'] = fileUrl;
     return data;
   }
 }

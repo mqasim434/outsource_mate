@@ -7,11 +7,13 @@ class MessageWidget extends StatelessWidget {
     required this.messageText,
     required this.time,
     this.isSender = true,
+    this.isImage = false,
   });
 
   String? messageText;
   String? time;
   bool isSender;
+  bool isImage;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +35,11 @@ class MessageWidget extends StatelessWidget {
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 8),
-              child: Text(
+              child: isImage?
+              SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: Image.network(messageText.toString())):Text(
                 messageText.toString(),
                 style: const TextStyle(
                   fontSize: 18,

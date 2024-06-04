@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:outsource_mate/models/project_model.dart';
 import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/signin_provider.dart';
@@ -16,6 +19,29 @@ class UtilityFunctions {
     } else {
       return 'N/A';
     }
+  }
+
+  static DateTime calculateRemainingTime(DateTime startTime, DateTime deadline) {
+    DateTime currentTime = DateTime.now();
+    DateTime remainingTime = DateTime.parse(deadline.difference(currentTime).toString());
+    return remainingTime;
+  }
+
+
+  static Future<String> uploadFileToFirebaseStorage(String filePath) async {
+    print('Uploading file');
+    EasyLoading.show(status: 'Uploading File');
+    final Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('chat_files')
+        .child(DateTime.now().millisecondsSinceEpoch.toString());
+    final UploadTask uploadTask = storageReference.putFile(File(filePath));
+
+    final TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
+
+    final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+    EasyLoading.dismiss();
+    return downloadUrl;
   }
 
   static EmployeeModel convertDocumentToUserModel(DocumentSnapshot doc) {

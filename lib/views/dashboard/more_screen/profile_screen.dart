@@ -1,14 +1,21 @@
+import 'dart:ffi';
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/profile_provider.dart';
 import 'package:outsource_mate/providers/signin_provider.dart';
+import 'package:outsource_mate/providers/user_provider.dart';
 import 'package:outsource_mate/res/components/rounded_rectangular_button.dart';
 import 'package:outsource_mate/res/myColors.dart';
+import 'package:outsource_mate/utils/utility_functions.dart';
 import 'package:provider/provider.dart';
+
 // Ignoring the lint rule
 // ignore_for_file: use_key_in_widget_constructors
 // ignore_for_file: prefer_const_constructors
@@ -23,6 +30,7 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+    final userProvider = Provider.of<UserProvider>(context);
 
     return SafeArea(
       child: Scaffold(
@@ -85,23 +93,87 @@ class ProfileScreen extends StatelessWidget {
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(150),
-                                image: UserModel.currentUser.imageUrl==null? const DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: AssetImage('assets/icons/male_user.png')
-                                ):DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: NetworkImage(UserModel.currentUser.imageUrl),
-                                ),
+                                image: UserModel.currentUser.imageUrl == null
+                                    ? const DecorationImage(
+                                        fit: BoxFit.cover,
+                                        image: AssetImage(
+                                            'assets/icons/male_user.png'))
+                                    : DecorationImage(
+                                        fit: BoxFit.cover,
+                                        image: NetworkImage(
+                                            UserModel.currentUser.imageUrl),
+                                      ),
                               ),
                             ),
                           ),
                         ),
-                        const Positioned(
+                        Positioned(
                           bottom: 15,
                           right: 0,
-                          child: CircleAvatar(
-                            backgroundColor: MyColors.pinkColor,
-                            child: Icon(Icons.add_a_photo),
+                          child: InkWell(
+                            onTap: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text('Select an Option:'),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          InkWell(
+                                            onTap: () async {
+                                              ImagePicker picker =
+                                                  ImagePicker();
+                                              XFile? pickedImage =
+                                                  await picker.pickImage(
+                                                      source:
+                                                          ImageSource.camera);
+                                            },
+                                            child: ListTile(
+                                              title: Text('Camera'),
+                                            ),
+                                          ),
+                                          InkWell(
+                                            onTap: ()async{
+                                    ImagePicker picker =
+                                    ImagePicker();
+                                    XFile? pickedImage =
+                                    await picker.pickImage(
+                                    source:
+                                    ImageSource.gallery);
+                                    if(pickedImage!=null){
+                                      showDialog(context: context, builder: (context){
+                                        return AlertDialog(title: Text('Image Preview'),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            SizedBox(width: 200,height: 200
+                                                ,child: Image.file(File(pickedImage.path))),
+                                            RoundedRectangularButton(buttonText: 'Upload', onPress: ()async{
+                                              String imageUrl = await UtilityFunctions.uploadFileToFirebaseStorage(pickedImage.path);
+                                              userProvider.updateUserField(fieldName: 'imageUrl', newValue: imageUrl).then((value) {
+                                                Navigator.pop(context);
+                                              });
+                                            })
+                                          ],
+                                        ),
+                                        );
+                                      });
+                                    }
+                                    },
+                                            child: ListTile(
+                                              title: Text('Gallery'),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  });
+                            },
+                            child: CircleAvatar(
+                              backgroundColor: MyColors.pinkColor,
+                              child: Icon(Icons.add_a_photo),
+                            ),
                           ),
                         ),
                       ],
@@ -137,7 +209,7 @@ class ProfileScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     MyTextField(
-                      label: UserModel.currentUser.name??'N/A',
+                      label: UserModel.currentUser.name ?? 'N/A',
                       textController: nameController,
                       icon: Icons.person,
                     ),
@@ -145,15 +217,16 @@ class ProfileScreen extends StatelessWidget {
                       height: 20,
                     ),
                     MyTextField(
-                      label: UserModel.currentUser.email??'N/A',
+                      label: UserModel.currentUser.email ?? 'N/A',
                       textController: emailController,
                       icon: Icons.email,
+                      isEditable: false,
                     ),
                     const SizedBox(
                       height: 20,
                     ),
                     MyTextField(
-                      label: UserModel.currentUser.phone??'N/A',
+                      label: UserModel.currentUser.phone ?? 'N/A',
                       textController: phoneController,
                       icon: Icons.phone,
                     ),
@@ -182,10 +255,12 @@ class MyTextField extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.textController,
+    this.isEditable = true,
   });
 
   final String label;
   final IconData icon;
+  final bool isEditable;
   final TextEditingController textController;
 
   @override
@@ -193,9 +268,10 @@ class MyTextField extends StatelessWidget {
     final profileProvider = Provider.of<ProfileProvider>(context);
     return TextFormField(
       controller: textController,
+      readOnly: !isEditable,
       decoration: InputDecoration(
         prefixIcon: Icon(icon),
-        suffixIcon: const Icon(Icons.edit),
+        suffixIcon: isEditable?Icon(Icons.edit):SizedBox(),
         hintText: label,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
@@ -207,8 +283,6 @@ class MyTextField extends StatelessWidget {
         ),
       ),
       onChanged: (value) {
-        print(label);
-        print(value);
         if (value.isNotEmpty) {
           profileProvider.switchEditing(true);
         } else {

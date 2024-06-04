@@ -8,16 +8,14 @@ class ChatProvider with ChangeNotifier{
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
   void sendMessage(MessageModel messageModel)async{
-    CollectionReference chatsCollection = firebaseFirestore.collection('chat');
+    CollectionReference chatsCollection = firebaseFirestore.collection('chats');
 
-    DocumentSnapshot documentSnapshot = (await chatsCollection.get()).docs.first;
-
-    CollectionReference freelancersChatCollection = documentSnapshot.reference.collection('freelancerClientChat');
-
-    await freelancersChatCollection.add({
+    await chatsCollection.add({
       'message': messageModel.messageText,
       'senderEmail': messageModel.senderEmail,
       'receiverEmail': messageModel.receiverEmail,
+      'isImage': messageModel.isImage,
+      'isDocument': messageModel.isDocument,
       'timestamp': FieldValue.serverTimestamp(), // This will automatically set the timestamp to the server's time
     });
   }

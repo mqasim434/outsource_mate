@@ -27,14 +27,16 @@ class ChatScreen extends StatelessWidget {
     final chatProvider = Provider.of<ChatProvider>(context);
     final userProvider = Provider.of<UserProvider>(context);
     TextEditingController messageController = TextEditingController();
-
     userProvider.updateUserField(fieldName: 'isOnline', newValue: true);
 
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
-          onPressed: (){
-            userProvider.updateUserField(fieldName: 'isOnline', newValue: false);
+          onPressed: () {
+            userProvider.updateUserField(
+                fieldName: 'isOnline', newValue: false);
+            userProvider.updateUserField(
+                fieldName: 'isTyping', newValue: false);
             Navigator.pop(context);
           },
         ),
@@ -47,28 +49,33 @@ class ChatScreen extends StatelessWidget {
                 color: Colors.black,
               ),
             ),
-            StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection(UtilityFunctions.getCollectionName(otherUser.userType))
-                  .where('email', isEqualTo: otherUser.email)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if(!snapshot.hasData){
-                  return const Text('No Data');
-                }else if(snapshot.connectionState==ConnectionState.waiting){
-                  return const CircularProgressIndicator();
-                }else{
-                  bool isTyping = snapshot.data!.docs.first.data()['isTyping'];
-                  return Text(
-                    isTyping?'typing...':'',
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 12,
-                    ),
-                  );
-                }
-              }
-            ),
+            otherUser != null
+                ? StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection(UtilityFunctions.getCollectionName(
+                            otherUser.userType.toString()))
+                        .where('email', isEqualTo: otherUser.email)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Text('Loading...');
+                      } else if (snapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const Text('Loading...');
+                      } else {
+                        bool isTyping =
+                            snapshot.data!.docs.first.data()['isTyping'] ??
+                                false;
+                        return Text(
+                          isTyping ? 'typing...' : '',
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 12,
+                          ),
+                        );
+                      }
+                    })
+                : const CircularProgressIndicator(),
           ],
         ),
         centerTitle: false,
@@ -83,37 +90,71 @@ class ChatScreen extends StatelessWidget {
                 Expanded(
                   child: StreamBuilder(
                     stream: FirebaseFirestore.instance
-                        .collection('chat')
-                        .doc('gMlFQdxujngu2REpnGTJ')
-                        .collection('freelancerClientChat')
+                        .collection('chats')
                         .orderBy('timestamp', descending: true)
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(
-                          child: CircularProgressIndicator(),
+                          child: CircularProgressIndicator(
+                            color: Colors.red,
+                          ),
                         );
-                      } else if (!snapshot.hasData) {
+                      }else if(!snapshot.hasData){
+                        return CircularProgressIndicator();
+                      }
+
+                      else if (snapshot.data!.docs.isEmpty) {
                         return const Center(
-                          child: Text('No Messages Yet!'),
+                          child: Text(
+                            'No Messages Yet!',
+                            style: TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
                         );
+                      } else if (snapshot.hasError) {
+                        return const CircularProgressIndicator();
                       } else {
-                        var messages = snapshot.data!.docs.toList();
+                        var messages = snapshot.data!.docs
+                            .toList()
+                            .where((element) => ((element['senderEmail'] ==
+                                        UserModel.currentUser.email
+                                            .toString() &&
+                                    element['receiverEmail'] ==
+                                        otherUser.email.toString()) ||
+                                element['receiverEmail'] ==
+                                        UserModel.currentUser.email
+                                            .toString() &&
+                                    element['senderEmail'] ==
+                                        otherUser.email.toString()))
+                            .toList();
                         return ListView.builder(
                             reverse: true,
                             itemCount: messages.length,
                             physics: const BouncingScrollPhysics(),
                             itemBuilder: (context, index) {
                               var message = messages[index];
-                              // DateTime dateTime = message['timestamp'].toDate();
-                              // DateFormat timeFormat = DateFormat.jm();
-                              // String timeString = timeFormat.format(dateTime);
+                              String time = message['timestamp']!=null? message['timestamp']
+                                  .toDate()
+                                  .toString()
+                                  .split(' ')[1]
+                                  .split('.')[0]:'';
+                              String amPm = int.parse(time.split(':')[0]) >= 12
+                                  ? 'PM'
+                                  : 'AM';
+                              String hour = int.parse(time.split(':')[0]) >= 12
+                                  ? (int.parse(time.split(':')[0]) % 12)
+                                      .toString()
+                                  : time.split(':')[0];
+                              String minutes = time.split(':')[1];
+                              String seconds = time.split(':')[2];
                               return MessageWidget(
-                                messageText: message['message'],
-                                // time: message['timestamp'].toDate().toString().split(' ')[1].split('.')[0],
+                                messageText: message['message'].toString(),
+                                time: '$hour:$minutes:$seconds $amPm',
                                 isSender: UserModel.currentUser.email ==
                                     message['senderEmail'],
-                                time: 'timeString',
+                                isImage: message['isImage'],
                               );
                             });
                       }
@@ -198,7 +239,8 @@ class ChatScreen extends StatelessWidget {
                                                                             .currentUser
                                                                             .email,
                                                                     receiverEmail:
-                                                                    otherUser.email
+                                                                        otherUser
+                                                                            .email
                                                                             .toString(),
                                                                   );
                                                                   // chatProvider.sendMessage();
@@ -251,7 +293,7 @@ class ChatScreen extends StatelessWidget {
                                                                       'Send Button Clicked');
                                                                   String
                                                                       downloadUrl =
-                                                                      await uploadFileToFirebaseStorage(
+                                                                      await UtilityFunctions.uploadFileToFirebaseStorage(
                                                                           pickedFile
                                                                               .path);
                                                                   MessageModel
@@ -264,10 +306,13 @@ class ChatScreen extends StatelessWidget {
                                                                             .currentUser
                                                                             .email,
                                                                     receiverEmail:
-                                                                    otherUser.email
+                                                                        otherUser
+                                                                            .email
                                                                             .toString(),
                                                                     isImage:
                                                                         true,
+                                                                    isDocument:
+                                                                        false,
                                                                   );
                                                                   chatProvider
                                                                       .sendMessage(
@@ -306,6 +351,8 @@ class ChatScreen extends StatelessWidget {
                               messageText: messageController.text,
                               senderEmail: UserModel.currentUser.email,
                               receiverEmail: otherUser.email.toString(),
+                              isImage: false,
+                              isDocument: false,
                             );
                             chatProvider.sendMessage(messageModel);
                             messageController.clear();
@@ -330,27 +377,11 @@ class ChatScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  TimeOfDay convertStringToTimeOfDay(String timeString) {
-    List<String> parts = timeString.split(':');
-    int hour = int.parse(parts[0]);
-    int minute = int.parse(parts[1]);
-    return TimeOfDay(hour: hour, minute: minute);
-  }
-
-  Future<String> uploadFileToFirebaseStorage(String filePath) async {
-    print('Uploading file');
-    EasyLoading.show(status: 'Uploading File');
-    final Reference storageReference = FirebaseStorage.instance
-        .ref()
-        .child('chat_files')
-        .child(DateTime.now().millisecondsSinceEpoch.toString());
-    final UploadTask uploadTask = storageReference.putFile(File(filePath));
-
-    final TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
-
-    final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
-    EasyLoading.dismiss();
-    return downloadUrl;
-  }
+TimeOfDay convertStringToTimeOfDay(String timeString) {
+  List<String> parts = timeString.split(':');
+  int hour = int.parse(parts[0]);
+  int minute = int.parse(parts[1]);
+  return TimeOfDay(hour: hour, minute: minute);
 }

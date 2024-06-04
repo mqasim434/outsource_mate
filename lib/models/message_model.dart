@@ -15,4 +15,27 @@ class MessageModel {
     this.isSender = true,
   });
 
+  // Convert a MessageModel instance to a Map (toJson)
+  Map<String, dynamic> toJson() {
+    return {
+      'messageText': messageText,
+      'isSender': isSender,
+      'senderEmail': senderEmail,
+      'receiverEmail': receiverEmail,
+      'isDocument': isDocument,
+      'isImage': isImage,
+    };
+  }
+
+  // Create a MessageModel instance from a Map (fromJson)
+  factory MessageModel.fromJson(Map<String, dynamic> json) {
+    return MessageModel(
+      messageText: json['messageText'],
+      isSender: json['isSender'],
+      senderEmail: json['senderEmail'],
+      receiverEmail: json['receiverEmail'],
+      isDocument: json['isDocument'],
+      isImage: json['isImage'],
+    );
+  }
 }

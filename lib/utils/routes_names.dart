@@ -29,4 +29,6 @@ class RouteName{
   static const String newPasswordScreen = 'newPassword';
 
   static const String projectDetailsScreen = 'projectDetails';
+
+  static const String notifications = 'notifications';
 }

@@ -10,6 +10,19 @@ class ProjectProvider extends ChangeNotifier {
 
   List<ProjectModel> get projectsList => _projectsList;
 
+  List<Map<String,bool>> modules = [];
+  String? fileUrl;
+
+  void addModule(Map<String,bool> module){
+    modules.add(module);
+    notifyListeners();
+  }
+
+  void addFileUrl(String url){
+    fileUrl = url;
+    notifyListeners();
+  }
+
   void getProjects(String email, String collection) async {
     print("Getting Projects");
     EasyLoading.show(status: 'Fetching Projects');
