@@ -15,7 +15,7 @@ import 'package:outsource_mate/providers/signup_provider.dart';
 import 'package:outsource_mate/providers/employee_provider.dart';
 import 'package:outsource_mate/providers/user_provider.dart';
 import 'package:outsource_mate/res/components/switch_button_widget.dart';
-import 'package:outsource_mate/services/awesome_notifications_service.dart';
+import 'package:outsource_mate/services/notifications_services.dart';
 import 'package:outsource_mate/utils/router.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +25,6 @@ import 'firebase_options.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  AwesomeNotificationServices.initializeNotification();
   runApp(const MyApp());
 }
 

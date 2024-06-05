@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/services/encrpyion_services.dart';
+import 'package:outsource_mate/services/notifications_services.dart';
 import 'package:outsource_mate/utils/login_session_manager.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 import 'package:outsource_mate/utils/utility_functions.dart';
@@ -12,6 +13,7 @@ class SigninProvider extends ChangeNotifier{
   UserRoles currentRoleSelected = UserRoles.FREELANCER;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final NotificationServices notificationServices = NotificationServices();
 
   void changeRole(UserRoles role){
     print("Role passed $role" );
@@ -48,17 +50,32 @@ class SigninProvider extends ChangeNotifier{
           ).then((value) async {
             if(currentRoleSelected==UserRoles.FREELANCER){
               UserModel.currentUser = await getUserDataByEmail(email,'freelancers');
-              LoginSessionManager.storeUserSession(email,'freelancers').then((value){
+              LoginSessionManager.storeUserSession(email,'freelancers').then((value) async {
+                final querySnapshot = await FirebaseFirestore.instance
+                    .collection('freelancers')
+                    .where('email', isEqualTo: email)
+                    .get();
+                for (final docSnapshot in querySnapshot.docs) {
+                  await docSnapshot.reference
+                      .update({'token': await notificationServices.getDeviceToken()});
+                }
                 Navigator.pushNamed(context, RouteName.dashboard);
               });
             }else if(currentRoleSelected==UserRoles.CLIENT){
               UserModel.currentUser = await getUserDataByEmail(email,'clients');
-              LoginSessionManager.storeUserSession(email,'clients').then((value){
+              LoginSessionManager.storeUserSession(email,'clients').then((value) async {
+                final querySnapshot = await FirebaseFirestore.instance
+                    .collection('Clients')
+                    .where('email', isEqualTo: email)
+                    .get();
+                for (final docSnapshot in querySnapshot.docs) {
+                  await docSnapshot.reference
+                      .update({'token': await notificationServices.getDeviceToken()});
+                }
                 Navigator.pushNamed(context, RouteName.dashboard);
               });
             }
             notifyListeners();
-
             return value;
           });
         }else{
@@ -101,6 +118,14 @@ class SigninProvider extends ChangeNotifier{
         if (employeeDoc['password'] == password) {
           UserModel.currentUser = UtilityFunctions.convertDocumentToUserModel(employeeDoc);
           EasyLoading.dismiss();
+          final querySnapshot = await FirebaseFirestore.instance
+              .collection('Employees')
+              .where('empId', isEqualTo: employeeId)
+              .get();
+          for (final docSnapshot in querySnapshot.docs) {
+            await docSnapshot.reference
+                .update({'token': await notificationServices.getDeviceToken()});
+          }
           return true; // Cr
           // edentials match
         } else {

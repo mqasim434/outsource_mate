@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 
 class MoreScreen extends StatelessWidget {
@@ -42,6 +43,7 @@ class MoreScreen extends StatelessWidget {
               icon: const Icon(Icons.logout),
               onTap: () {
                 FirebaseAuth.instance.signOut().then((value) {
+                  UserModel.currentUser = null;
                   Navigator.pushNamedAndRemoveUntil(context,
                       RouteName.signinScreen, (route) => route.isFirst);
                 });

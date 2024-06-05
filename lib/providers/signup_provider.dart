@@ -4,15 +4,16 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/signin_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:outsource_mate/services/notifications_services.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 
-class SignupProvider with ChangeNotifier{
-
+class SignupProvider with ChangeNotifier {
   UserRoles currentRoleSelected = UserRoles.FREELANCER;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final NotificationServices notificationServices = NotificationServices();
 
-  void changeRole(UserRoles role){
+  void changeRole(UserRoles role) {
     currentRoleSelected = role;
     notifyListeners();
   }
@@ -20,25 +21,28 @@ class SignupProvider with ChangeNotifier{
   bool _isVisible = true;
   bool get isVisible => _isVisible;
 
-  void togglePasswordVisibility(bool value){
+  void togglePasswordVisibility(bool value) {
     _isVisible = value;
     notifyListeners();
   }
 
-  Future<void> signupWithEmail(String email,String password,BuildContext context) async {
+  Future<void> signupWithEmail(
+      String email, String password, BuildContext context) async {
     try {
       EasyLoading.show(status: 'Creating Account');
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      saveUserInDatabase(userCredential).then((value){
+      saveUserInDatabase(userCredential).then((value) {
         print('Successfully signed up: ${userCredential.user!.uid}');
         EasyLoading.dismiss();
         Navigator.pushNamed(context, RouteName.dashboard);
       });
-    }catch (e) {
+    } catch (e) {
       EasyLoading.dismiss();
+      print(e);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error creating account: $e'),
@@ -48,34 +52,34 @@ class SignupProvider with ChangeNotifier{
     }
   }
 
-  Future<void> saveUserInDatabase(UserCredential userCredential)async{
+  Future<void> saveUserInDatabase(UserCredential userCredential) async {
     print("Selected Role: $currentRoleSelected");
-    if(currentRoleSelected==UserRoles.FREELANCER){
+    if (currentRoleSelected == UserRoles.FREELANCER) {
       final freelancer = FreelancerModel(
         email: userCredential.user!.email,
         userType: UserRoles.FREELANCER.name,
+        // deviceToken: await notificationServices.getDeviceToken(),
       );
-
+      UserModel.currentUser = freelancer;
       final jsonData = freelancer.toJson();
-      _firestore.collection('freelancers').add(jsonData).then((value){
+      _firestore.collection('freelancers').add(jsonData).then((value) {
         print('Freelancer added with ID: ${value.id}');
-      }).catchError((e){
+      }).catchError((e) {
         print('Error adding Freelancer: $e');
       });
-    } else if(currentRoleSelected==UserRoles.CLIENT){
+    } else if (currentRoleSelected == UserRoles.CLIENT) {
       final client = ClientModel(
         email: userCredential.user!.email,
         userType: UserRoles.CLIENT.name,
       );
-
+      UserModel.currentUser = client;
       final jsonData = client.toJson();
-      _firestore.collection('clients').add(jsonData).then((value){
+      _firestore.collection('clients').add(jsonData).then((value) {
         print('Client added with ID: ${value.id}');
-      }).catchError((e){
+      }).catchError((e) {
         print('Error adding client: $e');
       });
     }
     notifyListeners();
   }
-
 }

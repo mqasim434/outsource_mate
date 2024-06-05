@@ -11,6 +11,7 @@ class UserModel {
   bool? isOnline;
   bool? isTyping;
   String? lastSeen;
+  String? deviceToken;
   List<ProjectModel>? projects;
   UserModel({
     this.name,
@@ -22,6 +23,7 @@ class UserModel {
     this.isTyping,
     this.lastSeen,
     this.projects,
+    this.deviceToken,
   });
   static dynamic currentUser;
 }
@@ -41,6 +43,7 @@ class EmployeeModel extends UserModel {
     super.isOnline,
     super.isTyping,
     super.lastSeen,
+    super.deviceToken,
     this.position,
     this.password,
     this.empId,
@@ -62,6 +65,7 @@ class EmployeeModel extends UserModel {
     isOnline = json['isOnline'];
     isTyping = json['isTyping'];
     lastSeen = json['lastSeen'];
+    deviceToken = json['deviceToken'];
   }
 
   Map<String, dynamic> toJson() {
@@ -77,6 +81,7 @@ class EmployeeModel extends UserModel {
     data['isOnline'] = isOnline;
     data['isTyping'] = isTyping;
     data['lastSeen'] = lastSeen;
+    data['deviceToken'] = deviceToken;
     return data;
   }
 
@@ -97,6 +102,7 @@ class FreelancerModel extends UserModel {
     super.isTyping,
     super.lastSeen,
     super.projects,
+    super.deviceToken,
   });
 
   FreelancerModel.fromJson(Map<String, dynamic> json) {
@@ -108,6 +114,7 @@ class FreelancerModel extends UserModel {
     isOnline = json['isOnline'];
     isTyping = json['isTyping'];
     lastSeen = json['lastSeen'];
+    deviceToken = json['deviceToken'];
     projects = projects;
   }
 
@@ -121,6 +128,7 @@ class FreelancerModel extends UserModel {
     data['isOnline'] = isOnline;
     data['isTyping'] = isTyping;
     data['lastSeen'] = lastSeen;
+    data['deviceToken'] = deviceToken;
     projects = projects;
     return data;
   }
@@ -137,6 +145,7 @@ class ClientModel extends UserModel {
     super.isTyping,
     super.lastSeen,
     super.projects,
+    super.deviceToken,
   });
 
   ClientModel.fromJson(Map<String, dynamic> json) {
@@ -148,6 +157,7 @@ class ClientModel extends UserModel {
     isOnline = json['isOnline'];
     isTyping = json['isTyping'];
     lastSeen = json['lastSeen'];
+    deviceToken = json['deviceToken'];
     projects = projects;
   }
 
@@ -161,6 +171,7 @@ class ClientModel extends UserModel {
     data['isOnline'] = isOnline;
     data['isTyping'] = isTyping;
     data['lastSeen'] = lastSeen;
+    data['deviceToken'] = deviceToken;
     projects = projects;
     return data;
   }

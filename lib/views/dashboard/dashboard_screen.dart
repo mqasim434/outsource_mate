@@ -7,9 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:outsource_mate/models/project_model.dart';
 import 'package:outsource_mate/models/user_model.dart';
-import 'package:outsource_mate/providers/chat_provider.dart';
 import 'package:outsource_mate/providers/client_provider.dart';
-import 'package:outsource_mate/providers/freelancersProvider.dart';
 import 'package:outsource_mate/providers/project_provider.dart';
 import 'package:outsource_mate/providers/signin_provider.dart';
 import 'package:outsource_mate/res/components/my_text_field.dart';
@@ -290,7 +288,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                   .collection('freelancers')
                                                   .doc(newValue)
                                                   .get();
-                                          if (freelancerDoc!=null) {
                                             freelancerEmail = freelancerDoc['email'] ??
                                                 '';
                                             print(
@@ -300,9 +297,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                   freelancerDoc['name'] ??
                                                       '';
                                             });
-                                          } else {
-                                            print('Emty');
-                                          }
+
                                         }
                                       },
                                     );
