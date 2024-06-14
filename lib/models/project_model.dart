@@ -4,24 +4,24 @@ class ProjectModel {
   String? employeeName;
   String? freelancerName;
   String? clientName;
-  String? startingTime;
-  String? deadline;
+  DateTime? startingTime;
+  DateTime? deadline;
   String? projectStatus;
-  List<Map<String,bool>>? modules;
+  List<Map<String, bool>>? modules;
   String? fileUrl;
 
-  ProjectModel(
-      {this.projectTitle,
-      this.projectDescription,
-      this.employeeName,
-      this.freelancerName,
-      this.clientName,
-      this.startingTime,
-      this.deadline,
-      this.projectStatus,
-      this.modules,
-      this.fileUrl,
-      });
+  ProjectModel({
+    this.projectTitle,
+    this.projectDescription,
+    this.employeeName,
+    this.freelancerName,
+    this.clientName,
+    this.startingTime,
+    this.deadline,
+    this.projectStatus,
+    this.modules,
+    this.fileUrl,
+  });
 
   ProjectModel.fromJson(Map<String, dynamic> json) {
     projectTitle = json['projectTitle'];
@@ -29,13 +29,13 @@ class ProjectModel {
     employeeName = json['employeeName'];
     freelancerName = json['freelancerName'];
     clientName = json['clientName'];
-    startingTime = json['startingTime'];
-    deadline = json['deadline'];
+    startingTime = DateTime.parse(json['startingTime']);
+    deadline = DateTime.parse(json['deadline']);
     projectStatus = json['projectStatus'];
     modules = json['modules'] != null
         ? List<Map<String, bool>>.from(
-        json['modules'].map((x) => Map<String, bool>.from(x))
-    ): null;
+            json['modules'].map((x) => Map<String, bool>.from(x)))
+        : null;
     fileUrl = json['fileUrl'];
   }
 
@@ -46,8 +46,8 @@ class ProjectModel {
     data['employeeName'] = employeeName;
     data['freelancerName'] = freelancerName;
     data['clientName'] = clientName;
-    data['startingTime'] = startingTime;
-    data['deadline'] = deadline;
+    data['startingTime'] = startingTime!.toIso8601String();
+    data['deadline'] = deadline!.toIso8601String();
     data['projectStatus'] = projectStatus;
     data['modules'] = modules;
     data['fileUrl'] = fileUrl;

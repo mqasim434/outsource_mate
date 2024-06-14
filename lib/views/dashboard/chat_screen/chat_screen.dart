@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -11,14 +12,16 @@ import 'package:outsource_mate/providers/user_provider.dart';
 import 'package:outsource_mate/res/components/message_widget.dart';
 import 'package:outsource_mate/res/components/rounded_rectangular_button.dart';
 import 'package:outsource_mate/res/myColors.dart';
+import 'package:outsource_mate/services/notifications_services.dart';
 import 'package:outsource_mate/utils/utility_functions.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 class ChatScreen extends StatelessWidget {
-  const ChatScreen({super.key, this.otherUser});
+  ChatScreen({super.key, this.otherUser});
 
   final dynamic otherUser;
+  final NotificationServices notificationServices = NotificationServices();
 
   @override
   Widget build(BuildContext context) {

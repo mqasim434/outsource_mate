@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'package:flutter/material.dart';
 import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/client_provider.dart';
@@ -32,126 +34,200 @@ class _InboxScreenState extends State<InboxScreen> {
   Widget build(BuildContext context) {
     freelancersProvider.fetchFreelancers();
     clientsProvider.fetchClients();
+    employeeProvider.fetchEmployees();
     return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          centerTitle: true,
-          automaticallyImplyLeading: false,
-          title: const Text(
-            'Inbox',
-            style: TextStyle(
-              color: Colors.black,
-            ),
-          ),
-          elevation: 0,
-        ),
-        body: Column(
-          children: [
-            UserModel.currentUser.userType == 'CLIENT'
-                ? freelancersProvider.freelancersList.isEmpty
-                    ? const Center(
-                        child: Text('No Freelancers Found'),
-                      )
-                    : Expanded(
-                        child: ListView.builder(
-                          itemCount: freelancersProvider.freelancersList.length,
-                          itemBuilder: (context, index) {
-                            final FreelancerModel freelancer =
-                                freelancersProvider.freelancersList[index];
-                            return Card(
-                              child: ListTile(
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                      context, RouteName.chatScreen,
-                                      arguments: {
-                                        'otherUser': freelancer,
-                                      });
-                                },
-                                leading: const CircleAvatar(
-                                  child: Icon(Icons.person),
-                                ),
-                                title: freelancer.name!=null? Text(
-                                  freelancer.name.toString(),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ):Text(
-                                  freelancer.email.toString(),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                subtitle: const Text('Hello!'),
-                                trailing: const Text('8:46 PM'),
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                : UserModel.currentUser.userType == 'FREELANCER'
-                    ? clientsProvider.clientsList.isNotEmpty
-                        ? Expanded(
-                            child: ListView.builder(
-                              itemCount: clientsProvider.clientsList.length,
-                              itemBuilder: (context, index) {
-                                final ClientModel clientModel =
-                                    clientsProvider.clientsList[index];
-                                return Card(
-                                  child: ListTile(
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                          context, RouteName.chatScreen,
-                                          arguments: {
-                                            'otherUser': clientModel,
-                                          });
-                                    },
-                                    leading: const CircleAvatar(
-                                      child: Icon(Icons.person),
-                                    ),
-                                    title: Text(
-                                      clientModel.email.toString(),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    subtitle: const Text('Hello!'),
-                                    trailing: const Text('8:46 PM'),
-                                  ),
-                                );
-                              },
-                            ),
-                          )
-                        : const Text('')
-                    : const Text(''),
-            UserModel.currentUser.userType == 'EMPLOYEE'
-                ? ListView.builder(itemBuilder: (context, index) {
-                    return Card(
-                      child: ListTile(
-                        onTap: () {
-                          Navigator.pushNamed(context, RouteName.chatScreen,
-                              arguments: {
-                                'otherUser': '',
-                              });
-                        },
-                        leading: const CircleAvatar(
-                          child: Icon(Icons.person),
-                        ),
-                        title: const Text(
-                          '',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        subtitle: const Text('Hello!'),
-                        trailing: const Text('8:46 PM'),
+      child: UserModel.currentUser.userType == 'FREELANCER'
+          ? DefaultTabController(
+              length: 2,
+              child: Scaffold(
+                appBar: AppBar(
+                  backgroundColor: Colors.white,
+                  centerTitle: true,
+                  automaticallyImplyLeading: false,
+                  title: const Text(
+                    'Inbox',
+                    style: TextStyle(
+                      color: Colors.black,
+                    ),
+                  ),
+                  bottom: TabBar(
+                    tabs: [
+                      Tab(
+                        icon: Icon(Icons.person),
+                        text: 'Clients',
                       ),
-                    );
-                  })
-                : const SizedBox(),
-          ],
-        ),
-      ),
+                      Tab(
+                        icon: Icon(Icons.group),
+                        text: 'Employees',
+                      ),
+                    ],
+                  ),
+                  elevation: 0,
+                ),
+                body: TabBarView(
+                  children: [
+                    ListView.builder(
+                      itemCount: clientsProvider.clientsList.length,
+                      itemBuilder: (context, index) {
+                        final ClientModel clientModel =
+                            clientsProvider.clientsList[index];
+                        return Card(
+                          child: ListTile(
+                            onTap: () {
+                              Navigator.pushNamed(context, RouteName.chatScreen,
+                                  arguments: {
+                                    'otherUser': clientModel,
+                                  });
+                            },
+                            leading: const CircleAvatar(
+                              child: Icon(Icons.person),
+                            ),
+                            title: Text(
+                              clientModel.email.toString(),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: const Text('Hello!'),
+                            trailing: const Text('8:46 PM'),
+                          ),
+                        );
+                      },
+                    ),
+                    ListView.builder(
+                      itemCount: employeeProvider.employeeList.length,
+                      itemBuilder: (context, index) {
+                        final EmployeeModel employeeModel =
+                            employeeProvider.employeeList[index];
+                        return Card(
+                          child: ListTile(
+                            onTap: () {
+                              Navigator.pushNamed(context, RouteName.chatScreen,
+                                  arguments: {
+                                    'otherUser': employeeModel,
+                                  });
+                            },
+                            leading: const CircleAvatar(
+                              child: Icon(Icons.person),
+                            ),
+                            title: Text(
+                              employeeModel.email.toString(),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: const Text('Hello!'),
+                            trailing: const Text('8:46 PM'),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : Scaffold(
+              appBar: AppBar(
+                backgroundColor: Colors.white,
+                centerTitle: true,
+                automaticallyImplyLeading: false,
+                title: const Text(
+                  'Inbox',
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                ),
+                elevation: 0,
+              ),
+              body: Column(
+                children: [
+                  UserModel.currentUser.userType == 'CLIENT'
+                      ? freelancersProvider.freelancersList.isEmpty
+                          ? const Center(
+                              child: Text('No Freelancers Found'),
+                            )
+                          : Expanded(
+                              child: ListView.builder(
+                                itemCount:
+                                    freelancersProvider.freelancersList.length,
+                                itemBuilder: (context, index) {
+                                  final FreelancerModel freelancer =
+                                      freelancersProvider
+                                          .freelancersList[index];
+                                  return Card(
+                                    child: ListTile(
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                            context, RouteName.chatScreen,
+                                            arguments: {
+                                              'otherUser': freelancer,
+                                            });
+                                      },
+                                      leading: const CircleAvatar(
+                                        child: Icon(Icons.person),
+                                      ),
+                                      title: freelancer.name != null
+                                          ? Text(
+                                              freelancer.name.toString(),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            )
+                                          : Text(
+                                              freelancer.email.toString(),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                      subtitle: const Text('Hello!'),
+                                      trailing: const Text('8:46 PM'),
+                                    ),
+                                  );
+                                },
+                              ),
+                            )
+                      : UserModel.currentUser.userType == 'EMPLOYEE'
+                          ? Expanded(
+                              child: ListView.builder(
+                                  itemCount: freelancersProvider
+                                      .freelancersList.length,
+                                  itemBuilder: (context, index) {
+                                    FreelancerModel freelancer =
+                                        freelancersProvider
+                                            .freelancersList[index];
+                                    return Card(
+                                      child: ListTile(
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                              context, RouteName.chatScreen,
+                                              arguments: {
+                                                'otherUser': freelancer,
+                                              });
+                                        },
+                                        leading: const CircleAvatar(
+                                          child: Icon(Icons.person),
+                                        ),
+                                        title: Text(
+                                          (freelancer.name
+                                                      .toString()
+                                                      .isNotEmpty ||
+                                                  freelancer.name != null)
+                                              ? freelancer.name.toString()
+                                              : freelancer.email.toString(),
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        subtitle: const Text('Hello!'),
+                                        trailing: const Text('8:46 PM'),
+                                      ),
+                                    );
+                                  }),
+                            )
+                          : const SizedBox(),
+                ],
+              ),
+            ),
     );
   }
 }

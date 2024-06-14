@@ -58,7 +58,7 @@ class SignupProvider with ChangeNotifier {
       final freelancer = FreelancerModel(
         email: userCredential.user!.email,
         userType: UserRoles.FREELANCER.name,
-        // deviceToken: await notificationServices.getDeviceToken(),
+        deviceToken: await notificationServices.getDeviceToken(),
       );
       UserModel.currentUser = freelancer;
       final jsonData = freelancer.toJson();
@@ -71,6 +71,7 @@ class SignupProvider with ChangeNotifier {
       final client = ClientModel(
         email: userCredential.user!.email,
         userType: UserRoles.CLIENT.name,
+        deviceToken: await notificationServices.getDeviceToken(),
       );
       UserModel.currentUser = client;
       final jsonData = client.toJson();

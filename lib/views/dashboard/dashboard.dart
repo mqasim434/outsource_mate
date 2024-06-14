@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:outsource_mate/providers/bottom_navbar_provider.dart';
 import 'package:outsource_mate/res/components/bottom_navbar.dart';
+import 'package:outsource_mate/services/notifications_services.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 import 'package:outsource_mate/views/dashboard/chat_screen/inbox_screen.dart';
 import 'package:outsource_mate/views/dashboard/dashboard_screen.dart';
@@ -8,9 +9,25 @@ import 'package:outsource_mate/views/dashboard/more_screen/more_screen.dart';
 import 'package:outsource_mate/views/dashboard/projects_screen.dart';
 import 'package:provider/provider.dart';
 
-class Dashboard extends StatelessWidget {
+class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
 
+  @override
+  State<Dashboard> createState() => _DashboardState();
+}
+
+class _DashboardState extends State<Dashboard> {
+  
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    NotificationServices().requestNotificationPermissions();
+    NotificationServices().firebaseInit(context);
+    
+  }
+  
   @override
   Widget build(BuildContext context) {
     final bottomNavbarProvider = Provider.of<BottomNavbarProvider>(context);

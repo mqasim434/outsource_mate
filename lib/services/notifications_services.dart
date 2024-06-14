@@ -17,14 +17,6 @@ class NotificationServices {
       if (Platform.isAndroid) {
         initNotifications(context, notification);
         showNotification(notification);
-        // AwesomeNotificationServices.showNotification(
-        //     title: notification.notification!.title.toString(),
-        //     body: notification.notification!.body.toString(),
-        //     payload: {"navigate":"true"},
-        //     actionButtons: [
-        //       NotificationActionButton(
-        //           requireInputText: true, key: 'input', label: 'Reply'),
-        //     ]);
       }
     });
   }

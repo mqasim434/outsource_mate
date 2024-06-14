@@ -57,7 +57,7 @@ class SigninProvider extends ChangeNotifier{
                     .get();
                 for (final docSnapshot in querySnapshot.docs) {
                   await docSnapshot.reference
-                      .update({'token': await notificationServices.getDeviceToken()});
+                      .update({'deviceToken': await notificationServices.getDeviceToken()});
                 }
                 Navigator.pushNamed(context, RouteName.dashboard);
               });
@@ -70,7 +70,7 @@ class SigninProvider extends ChangeNotifier{
                     .get();
                 for (final docSnapshot in querySnapshot.docs) {
                   await docSnapshot.reference
-                      .update({'token': await notificationServices.getDeviceToken()});
+                      .update({'deviceToken': await notificationServices.getDeviceToken()});
                 }
                 Navigator.pushNamed(context, RouteName.dashboard);
               });

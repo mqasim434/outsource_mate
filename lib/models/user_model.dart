@@ -22,7 +22,7 @@ class UserModel {
     this.isOnline,
     this.isTyping,
     this.lastSeen,
-    this.projects,
+    this.projects = const [],
     this.deviceToken,
   });
   static dynamic currentUser;
@@ -37,7 +37,7 @@ class EmployeeModel extends UserModel {
     super.name,
     super.email,
     super.phone,
-    super.projects,
+    super.projects = const [],
     super.userType,
     super.imageUrl,
     super.isOnline,
@@ -60,12 +60,17 @@ class EmployeeModel extends UserModel {
     empId = json['empId'];
     password = json['password'];
     imageUrl = json['imageUrl'];
-    projects = projects;
     userType = json['userType'];
     isOnline = json['isOnline'];
     isTyping = json['isTyping'];
     lastSeen = json['lastSeen'];
     deviceToken = json['deviceToken'];
+    if (json['projects'] != null) {
+      projects = [];
+      json['projects'].forEach((v) {
+        projects!.add(ProjectModel.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -76,12 +81,14 @@ class EmployeeModel extends UserModel {
     data['position'] = position;
     data['empId'] = empId;
     data['imageUrl'] = imageUrl;
-    projects = projects;
     data['userType'] = userType;
     data['isOnline'] = isOnline;
     data['isTyping'] = isTyping;
     data['lastSeen'] = lastSeen;
     data['deviceToken'] = deviceToken;
+    if (projects != null) {
+      data['projects'] = projects!.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 
@@ -101,7 +108,7 @@ class FreelancerModel extends UserModel {
     super.isOnline,
     super.isTyping,
     super.lastSeen,
-    super.projects,
+    super.projects = const [],
     super.deviceToken,
   });
 
@@ -115,7 +122,12 @@ class FreelancerModel extends UserModel {
     isTyping = json['isTyping'];
     lastSeen = json['lastSeen'];
     deviceToken = json['deviceToken'];
-    projects = projects;
+    if (json['projects'] != null) {
+      projects = [];
+      json['projects'].forEach((v) {
+        projects!.add(ProjectModel.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -129,7 +141,9 @@ class FreelancerModel extends UserModel {
     data['isTyping'] = isTyping;
     data['lastSeen'] = lastSeen;
     data['deviceToken'] = deviceToken;
-    projects = projects;
+    if (projects != null) {
+      data['projects'] = projects!.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 }
@@ -144,7 +158,7 @@ class ClientModel extends UserModel {
     super.isOnline,
     super.isTyping,
     super.lastSeen,
-    super.projects,
+    super.projects = const [],
     super.deviceToken,
   });
 
@@ -158,7 +172,12 @@ class ClientModel extends UserModel {
     isTyping = json['isTyping'];
     lastSeen = json['lastSeen'];
     deviceToken = json['deviceToken'];
-    projects = projects;
+    if (json['projects'] != null) {
+      projects = [];
+      json['projects'].forEach((v) {
+        projects!.add(ProjectModel.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -172,7 +191,9 @@ class ClientModel extends UserModel {
     data['isTyping'] = isTyping;
     data['lastSeen'] = lastSeen;
     data['deviceToken'] = deviceToken;
-    projects = projects;
+    if (projects != null) {
+      data['projects'] = projects!.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 }

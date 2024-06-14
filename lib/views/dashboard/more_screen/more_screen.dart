@@ -31,13 +31,15 @@ class MoreScreen extends StatelessWidget {
                 Navigator.pushNamed(context, RouteName.profileScreen);
               },
             ),
-            MoreScreenButtonWidget(
-              label: 'Team',
-              icon: const Icon(Icons.people),
-              onTap: () {
-                Navigator.pushNamed(context, RouteName.teamScreen);
-              },
-            ),
+            UserModel.currentUser.userType == 'FREELANCER'
+                ? MoreScreenButtonWidget(
+                    label: 'Team',
+                    icon: const Icon(Icons.people),
+                    onTap: () {
+                      Navigator.pushNamed(context, RouteName.teamScreen);
+                    },
+                  )
+                : SizedBox(),
             MoreScreenButtonWidget(
               label: 'Logout',
               icon: const Icon(Icons.logout),

@@ -134,33 +134,58 @@ class ProfileScreen extends StatelessWidget {
                                             ),
                                           ),
                                           InkWell(
-                                            onTap: ()async{
-                                    ImagePicker picker =
-                                    ImagePicker();
-                                    XFile? pickedImage =
-                                    await picker.pickImage(
-                                    source:
-                                    ImageSource.gallery);
-                                    if(pickedImage!=null){
-                                      showDialog(context: context, builder: (context){
-                                        return AlertDialog(title: Text('Image Preview'),
-                                        content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            SizedBox(width: 200,height: 200
-                                                ,child: Image.file(File(pickedImage.path))),
-                                            RoundedRectangularButton(buttonText: 'Upload', onPress: ()async{
-                                              String imageUrl = await UtilityFunctions.uploadFileToFirebaseStorage(pickedImage.path);
-                                              userProvider.updateUserField(fieldName: 'imageUrl', newValue: imageUrl).then((value) {
-                                                Navigator.pop(context);
-                                              });
-                                            })
-                                          ],
-                                        ),
-                                        );
-                                      });
-                                    }
-                                    },
+                                            onTap: () async {
+                                              ImagePicker picker =
+                                                  ImagePicker();
+                                              XFile? pickedImage =
+                                                  await picker.pickImage(
+                                                      source:
+                                                          ImageSource.gallery);
+                                              if (pickedImage != null) {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return AlertDialog(
+                                                        title: Text(
+                                                            'Image Preview'),
+                                                        content: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            SizedBox(
+                                                                width: 200,
+                                                                height: 200,
+                                                                child: Image.file(
+                                                                    File(pickedImage
+                                                                        .path))),
+                                                            RoundedRectangularButton(
+                                                                buttonText:
+                                                                    'Upload',
+                                                                onPress:
+                                                                    () async {
+                                                                  String
+                                                                      imageUrl =
+                                                                      await UtilityFunctions.uploadFileToFirebaseStorage(
+                                                                          pickedImage
+                                                                              .path);
+                                                                  userProvider
+                                                                      .updateUserField(
+                                                                          fieldName:
+                                                                              'imageUrl',
+                                                                          newValue:
+                                                                              imageUrl)
+                                                                      .then(
+                                                                          (value) {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  });
+                                                                })
+                                                          ],
+                                                        ),
+                                                      );
+                                                    });
+                                              }
+                                            },
                                             child: ListTile(
                                               title: Text('Gallery'),
                                             ),
@@ -271,7 +296,7 @@ class MyTextField extends StatelessWidget {
       readOnly: !isEditable,
       decoration: InputDecoration(
         prefixIcon: Icon(icon),
-        suffixIcon: isEditable?Icon(Icons.edit):SizedBox(),
+        suffixIcon: isEditable ? Icon(Icons.edit) : SizedBox(),
         hintText: label,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(

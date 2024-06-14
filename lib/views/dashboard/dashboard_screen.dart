@@ -48,7 +48,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
-  final deadlineController = TextEditingController();
+  DateTime? deadlineController;
   final freelancerController = TextEditingController();
   final moduleController = TextEditingController();
 
@@ -280,7 +280,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         setState(() {
                                           selectedFreelancerId =
                                               newValue.toString();
-                                          print('selected ${selectedFreelancerId}');
+                                          print(
+                                              'selected ${selectedFreelancerId}');
                                         });
                                         if (newValue != null) {
                                           DocumentSnapshot freelancerDoc =
@@ -288,16 +289,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                   .collection('freelancers')
                                                   .doc(newValue)
                                                   .get();
-                                            freelancerEmail = freelancerDoc['email'] ??
-                                                '';
-                                            print(
-                                                'Sending ${freelancerDoc['email']}');
-                                            setState(() {
-                                              freelancerController.text =
-                                                  freelancerDoc['name'] ??
-                                                      '';
-                                            });
-
+                                          freelancerEmail =
+                                              freelancerDoc['email'] ?? '';
+                                          print(
+                                              'Sending ${freelancerDoc['email']}');
+                                          setState(() {
+                                            freelancerController.text =
+                                                freelancerDoc['name'] ??
+                                                    freelancerDoc['name'];
+                                          });
                                         }
                                       },
                                     );
@@ -307,7 +307,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   height: 10,
                                 ),
                                 TextFormField(
-                                  controller: deadlineController,
                                   readOnly: true,
                                   onTap: () async {
                                     final DateTime? pickedDateTime =
@@ -320,8 +319,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           DateTime(DateTime.now().year + 5),
                                     );
                                     if (pickedDateTime != null) {
-                                      deadlineController.text =
-                                          '${pickedDateTime.day}/${pickedDateTime.month}/${pickedDateTime.year} ${DateTime.now().hour}:${DateTime.now().minute} ${DateTime.now().second < 12 ? 'AM' : 'PM'}';
+                                      deadlineController = pickedDateTime;
+                                      setState(() {});
                                     }
                                   },
                                   decoration: InputDecoration(
@@ -461,17 +460,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 RoundedRectangularButton(
                                   buttonText: 'Create',
                                   onPress: () {
+                                    print(freelancerController.text);
                                     ProjectModel newProject = ProjectModel(
                                         projectTitle: titleController.text,
                                         projectDescription:
                                             descriptionController.text,
-                                        deadline: deadlineController.text,
+                                        deadline: deadlineController,
                                         projectStatus: 'In Progress',
                                         freelancerName:
                                             freelancerController.text,
-                                        startingTime:
-                                            '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year} ${DateTime.now().hour}:${DateTime.now().minute} ${DateTime.now().second < 12 ? 'AM' : 'PM'}',
-                                        clientName: UserModel.currentUser.name,
+                                        startingTime: DateTime.now(),
+                                        clientName:
+                                            UserModel.currentUser.name ??
+                                                UserModel.currentUser.email,
                                         modules: projectsProvider.modules,
                                         fileUrl: projectsProvider.fileUrl);
                                     projectsProvider.addProject(newProject);

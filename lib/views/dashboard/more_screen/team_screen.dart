@@ -297,7 +297,7 @@ class _TeamMemberWidgetState extends State<TeamMemberWidget> {
                                             print(value);
                                             projectProvider.updateIndex(value as int);
                                             setState(() {
-
+                                              
                                             });
                                           },
                                         ),

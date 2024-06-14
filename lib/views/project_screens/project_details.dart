@@ -23,28 +23,28 @@ class ProjectDetailsScreen extends StatefulWidget {
 class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   DateFormat dateFormat = DateFormat("MM/dd/yyyy hh:mm a");
 
-  int getProgressCount(){
+  int getProgressCount() {
     int progress = 0;
     int count = 0;
-    for(int i=0;i<widget.project.modules!.length;i++){
-      if(widget.project.modules?[i].values.toList().first==true){
+    for (int i = 0; i < widget.project.modules!.length; i++) {
+      if (widget.project.modules?[i].values.toList().first == true) {
         count++;
       }
     }
-    progress = ((count/(widget.project.modules!.length))*100).toInt();
+    progress = ((count / (widget.project.modules!.length)) * 100).toInt();
     return progress;
   }
 
-
-  int getProgressWidth(double screenWidth){
+  int getProgressWidth(double screenWidth) {
     int progress = 0;
     int count = 0;
-    for(int i=0;i<widget.project.modules!.length;i++){
-      if(widget.project.modules?[i].values.toList().first==true){
+    for (int i = 0; i < widget.project.modules!.length; i++) {
+      if (widget.project.modules?[i].values.toList().first == true) {
         count++;
       }
     }
-    progress = ((count/(widget.project.modules!.length))*screenWidth).toInt();
+    progress =
+        ((count / (widget.project.modules!.length)) * screenWidth).toInt();
     return progress;
   }
 
@@ -52,11 +52,6 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-    print(getProgressWidth(screenWidth));
-    // final DateTime timeRemaining = UtilityFunctions.calculateRemainingTime(
-    //     dateFormat.parse(widget.project.startingTime.toString()),
-    //     dateFormat.parse(widget.project.deadline.toString()));
-    print(dateFormat.parse(widget.project.startingTime.toString()));
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(
@@ -86,6 +81,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
@@ -221,7 +217,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
               alignment: Alignment.centerLeft,
               children: [
                 Container(
-                  height: 50+1,
+                  height: 50 + 1,
                   width: (screenWidth),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(50),
@@ -235,14 +231,19 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                   decoration: BoxDecoration(
                     gradient: MyColors.pinkPurpleGradient,
                     borderRadius: BorderRadius.circular(50),
-                    border: getProgressCount()==100?Border.all(color: Colors.black):null,
+                    border: getProgressCount() == 100
+                        ? Border.all(color: Colors.black)
+                        : null,
                   ),
                   child: Center(
-                    child: Text('${getProgressCount().toString()}%',style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),),
+                    child: Text(
+                      '${getProgressCount().toString()}%',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -355,8 +356,8 @@ class TimerDisplayBox extends StatelessWidget {
           style: const TextStyle(fontSize: 20, height: 2),
         ),
         Container(
-          width: 100,
-          height: 100,
+          width: MediaQuery.of(context).size.width * 0.2,
+          height: MediaQuery.of(context).size.width * 0.2,
           decoration: BoxDecoration(
             gradient: MyColors.pinkPurpleGradient,
             borderRadius: BorderRadius.circular(10),
