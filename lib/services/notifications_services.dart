@@ -31,8 +31,8 @@ class NotificationServices {
 
   showNotification(RemoteMessage message) async {
     String projectId = dotenv.env['PROJECT_ID']!;
-    final String jsonCredentials = await rootBundle
-        .loadString('assets/outsource-mate-f4c50-797eec49eae5.json');
+    final String jsonCredentials =
+        await rootBundle.loadString(dotenv.env['GOOGLE_CLOUD_CONFIG_FILE']!);
     final creds = auth.ServiceAccountCredentials.fromJson(jsonCredentials);
 
     final client = await auth.clientViaServiceAccount(
