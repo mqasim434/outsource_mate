@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 class CustomTimerProvider with ChangeNotifier {
@@ -9,7 +8,9 @@ class CustomTimerProvider with ChangeNotifier {
   int _seconds = 0;
 
   Timer? _timer;
-  StreamController<dynamic> _streamController = StreamController<dynamic>.broadcast();
+  final StreamController<dynamic> _streamController =
+      StreamController<dynamic>.broadcast();
+
   int get days => _days;
   int get hours => _hours;
   int get minutes => _minutes;
@@ -37,6 +38,12 @@ class CustomTimerProvider with ChangeNotifier {
     }
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_days == 0 && _hours == 0 && _minutes == 0 && _seconds == 0) {
+        timer.cancel();
+        _timer = null;
+        return;
+      }
+
       if (_seconds > 0) {
         _seconds--;
       } else if (_minutes > 0) {
@@ -51,9 +58,6 @@ class CustomTimerProvider with ChangeNotifier {
         _minutes = 59;
         _hours = 23;
         _days--;
-      } else {
-        timer.cancel();
-        _timer = null;
       }
 
       _streamController.add(null);

@@ -1,21 +1,22 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:outsource_mate/models/notification_model.dart';
 import 'package:outsource_mate/models/project_model.dart';
 import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/client_provider.dart';
+import 'package:outsource_mate/providers/notifications_provider.dart';
 import 'package:outsource_mate/providers/project_provider.dart';
 import 'package:outsource_mate/providers/signin_provider.dart';
 import 'package:outsource_mate/res/components/my_text_field.dart';
 import 'package:outsource_mate/res/components/project_widget.dart';
 import 'package:outsource_mate/res/components/rounded_rectangular_button.dart';
 import 'package:outsource_mate/res/myColors.dart';
+import 'package:outsource_mate/utils/enums.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 import 'package:outsource_mate/utils/utility_functions.dart';
+import 'package:outsource_mate/views/dashboard/notifications_screen.dart';
 import 'package:provider/provider.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -28,8 +29,10 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   ProjectProvider projectsProvider = ProjectProvider();
   ClientProvider clientProvider = ClientProvider();
+  NotificationsProvider notificationsProvider = NotificationsProvider();
   String? selectedFreelancerId;
   String? freelancerEmail;
+
   String getCollectionName() {
     print(UserModel.currentUser.userType);
     if (UserModel.currentUser.userType.toString() ==
@@ -54,12 +57,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
+    super.initState();
     projectsProvider = Provider.of<ProjectProvider>(context, listen: false);
     clientProvider = Provider.of<ClientProvider>(context, listen: false);
-    projectsProvider.getProjects(
-        UserModel.currentUser.email, getCollectionName());
-    super.initState();
+    _loadProjects();
+  }
+
+  Future<void> _loadProjects() async {
+    await projectsProvider.getProjects();
   }
 
   @override
@@ -86,9 +91,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ListTile(
-                    leading: const CircleAvatar(child: Icon(Icons.person)),
+                    leading: const CircleAvatar(
+                      child: Icon(Icons.person),
+                      radius: 25,
+                    ),
                     title: Text(
-                      'Hi! ${UserModel.currentUser != null ? UserModel.currentUser.email : 'User'}',
+                      'Hi! \n${UserModel.currentUser != null ? UserModel.currentUser.email : 'User'}',
                       style: const TextStyle(fontSize: 20, color: Colors.white),
                     ),
                     subtitle: Text(
@@ -133,28 +141,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       height: 10,
                     ),
                     Expanded(
-                      child: projectsProvider.projectsList.isEmpty
-                          ? const Center(
-                              child: Text("No Projects Yet"),
-                            )
-                          : ListView.builder(
-                              itemCount: projectsProvider.projectsList.length,
-                              itemBuilder: (context, index) {
-                                // Print the project to the console to check if it's being displayed
-                                print(
-                                    'Projects ${projectsProvider.projectsList[index]}');
-
-                                final project =
-                                    projectsProvider.projectsList[index];
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20.0, vertical: 10),
-                                  child: ProjectWidget(
-                                    projectModel: project,
-                                  ),
-                                );
-                              },
-                            ),
+                      child: FutureBuilder(
+                        future: _loadProjects(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                          if (projectsProvider.projectsList.isEmpty) {
+                            return const Center(child: Text("No Projects Yet"));
+                          }
+                          return ListView.builder(
+                            itemCount: projectsProvider.projectsList.length,
+                            itemBuilder: (context, index) {
+                              final project =
+                                  projectsProvider.projectsList[index];
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20.0, vertical: 10),
+                                child: ProjectWidget(projectModel: project),
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -295,8 +306,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                               'Sending ${freelancerDoc['email']}');
                                           setState(() {
                                             freelancerController.text =
-                                                freelancerDoc['name'] ??
-                                                    freelancerDoc['name'];
+                                                freelancerDoc['email'];
                                           });
                                         }
                                       },
@@ -309,7 +319,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 TextFormField(
                                   readOnly: true,
                                   onTap: () async {
-                                    final DateTime? pickedDateTime =
+                                    final DateTime? pickedDate =
                                         await showDatePicker(
                                       context: context,
                                       initialDate: DateTime.now(),
@@ -318,17 +328,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       lastDate:
                                           DateTime(DateTime.now().year + 5),
                                     );
-                                    if (pickedDateTime != null) {
-                                      deadlineController = pickedDateTime;
+                                    if (pickedDate != null) {
+                                      // Combine picked date with current time
+                                      final DateTime currentTime =
+                                          DateTime.now();
+                                      deadlineController = DateTime(
+                                        pickedDate.year,
+                                        pickedDate.month,
+                                        pickedDate.day,
+                                        currentTime.hour,
+                                        currentTime.minute,
+                                        currentTime.second,
+                                      );
                                       setState(() {});
                                     }
                                   },
                                   decoration: InputDecoration(
                                     hintText: 'Select Deadline',
                                     border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(
-                                      50,
-                                    )),
+                                      borderRadius: BorderRadius.circular(50),
+                                    ),
                                     suffixIcon: const Icon(Icons.timer_sharp),
                                     contentPadding: const EdgeInsets.only(
                                       left: 20,
@@ -467,28 +486,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                             descriptionController.text,
                                         deadline: deadlineController,
                                         projectStatus: 'In Progress',
-                                        freelancerName:
-                                            freelancerController.text,
+                                        freelancerEmail:
+                                            freelancerEmail.toString(),
                                         startingTime: DateTime.now(),
-                                        clientName:
-                                            UserModel.currentUser.name ??
-                                                UserModel.currentUser.email,
+                                        clientEmail:
+                                            UserModel.currentUser.email,
                                         modules: projectsProvider.modules,
                                         fileUrl: projectsProvider.fileUrl);
-                                    projectsProvider.addProject(newProject);
-                                    clientProvider
-                                        .addProjectToFreelancerByEmail(
-                                            freelancerEmail.toString(),
-                                            newProject)
+                                    projectsProvider
+                                        .addProject(newProject, context)
                                         .then((value) {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return const AlertDialog(
-                                            title: Text('New Project Created'),
-                                          );
-                                        },
+                                      NotificationModel notificationModel =
+                                          NotificationModel(
+                                        title: 'New Project',
+                                        description:
+                                            'You created a new project',
+                                        userId: UserModel.currentUser.email,
+                                        time: DateTime.now(),
+                                        notificationType:
+                                            NotificationTypes.PROJECT.name,
                                       );
+                                      notificationsProvider
+                                          .addNotification(notificationModel);
                                     });
                                   },
                                 ),

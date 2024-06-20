@@ -27,14 +27,18 @@ class _InboxScreenState extends State<InboxScreen> {
         Provider.of<FreelancersProvider>(context, listen: false);
     clientsProvider = Provider.of<ClientProvider>(context, listen: false);
     employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+    loadData();
     super.initState();
+  }
+
+  Future<void> loadData() async {
+    freelancersProvider.fetchFreelancers();
+    clientsProvider.fetchClients();
+    employeeProvider.fetchEmployees();
   }
 
   @override
   Widget build(BuildContext context) {
-    freelancersProvider.fetchFreelancers();
-    clientsProvider.fetchClients();
-    employeeProvider.fetchEmployees();
     return SafeArea(
       child: UserModel.currentUser.userType == 'FREELANCER'
           ? DefaultTabController(

@@ -1,15 +1,16 @@
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
+
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:outsource_mate/models/project_model.dart';
+import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/custom_timer_provider.dart';
+import 'package:outsource_mate/providers/project_provider.dart';
+import 'package:outsource_mate/providers/signin_provider.dart';
 import 'package:outsource_mate/res/myColors.dart';
-import 'package:outsource_mate/utils/utility_functions.dart';
 import 'package:provider/provider.dart';
-import 'package:slide_countdown/slide_countdown.dart';
 
 class ProjectDetailsScreen extends StatefulWidget {
   const ProjectDetailsScreen({super.key, required this.project});
@@ -48,232 +49,341 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     return progress;
   }
 
+  String? projectStatus;
+
+  ProjectProvider projectProvider = ProjectProvider();
+
+  initializeProvider(BuildContext context) {
+    projectProvider = Provider.of<ProjectProvider>(context);
+  }
+
+  bool checkIfOverdue(DateTime deadline) {
+    DateTime now = DateTime.now();
+    print(now.isAfter(deadline));
+    return now.isAfter(deadline);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    projectStatus = widget.project.projectStatus;
+    print(projectStatus);
+    if (projectStatus != 'Completed' &&
+        checkIfOverdue(widget.project.deadline as DateTime)) {
+      projectProvider.updateProjectStatus(
+          widget.project.projectId.toString(), 'Overdue');
+    }
+  }
+
+  bool isDescriptionExpanded = false;
+  bool isModulesExpanded = false;
+
   @override
   Widget build(BuildContext context) {
+    initializeProvider(context);
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     return SafeArea(
-        child: Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: const Text(
-          'Project Details',
-          style: TextStyle(
-            color: Colors.black,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          title: const Text(
+            'Project Details',
+            style: TextStyle(
+              color: Colors.black,
+            ),
           ),
+          elevation: 1,
         ),
-        elevation: 0,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: screenWidth * 0.7,
-                  child: Text(
-                    widget.project.projectTitle.toString(),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
+            SizedBox(
+              height: screenHeight * 0.53,
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            widget.project.projectTitle.toString(),
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      UserModel.currentUser.userType == 'Employee'
+                          ? SizedBox()
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Project Status: ',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Chip(
+                                  label: Text(
+                                    widget.project.projectStatus.toString(),
+                                  ),
+                                  backgroundColor: MyColors.pinkColor,
+                                ),
+                                // DropdownButton(
+                                //   style: TextStyle(
+                                //       fontSize: 14, color: Colors.black),
+                                //   underline: null,
+                                //   value: projectStatus,
+                                //   items: [
+                                //     const DropdownMenuItem(
+                                //       value: 'In Progress',
+                                //       child: Text('In Progress'),
+                                //     ),
+                                //     const DropdownMenuItem(
+                                //       value: 'In Revision',
+                                //       child: Text('In Revision'),
+                                //     ),
+                                //     const DropdownMenuItem(
+                                //       value: 'Completed',
+                                //       child: Text('Completed'),
+                                //     ),
+                                //     const DropdownMenuItem(
+                                //       value: 'Cancelled',
+                                //       child: Text('Cancelled'),
+                                //     ),
+                                //   ],
+                                //   onChanged: (value) {
+                                //     projectStatus = value;
+                                //     setState(() {});
+                                //   },
+                                // )
+                              ],
+                            ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      ExpansionPanelList(
+                        expansionCallback: (int index, bool isExpanded) {
+                          setState(() {
+                            if (index == 0) {
+                              isDescriptionExpanded = !isDescriptionExpanded;
+                            } else if (index == 1) {
+                              isModulesExpanded = !isModulesExpanded;
+                            }
+                          });
+                        },
+                        children: [
+                          ExpansionPanel(
+                            headerBuilder:
+                                (BuildContext context, bool isExpanded) {
+                              return ListTile(
+                                title: Text('Description'),
+                              );
+                            },
+                            body: ListTile(
+                              title: Text(
+                                  widget.project.projectDescription.toString()),
+                            ),
+                            isExpanded: isDescriptionExpanded,
+                          ),
+                          ExpansionPanel(
+                            headerBuilder:
+                                (BuildContext context, bool isExpanded) {
+                              return ListTile(
+                                title: Text('Modules'),
+                              );
+                            },
+                            body: SizedBox(
+                              height: 200,
+                              child: ListView.builder(
+                                itemCount: widget.project.modules!.length,
+                                itemBuilder: ((context, index) {
+                                  var module = widget.project.modules![index];
+                                  return ListTile(
+                                    title: Text(
+                                      '${index + 1}) ${module.keys.first}',
+                                      style: TextStyle(
+                                          decoration:
+                                              module.values.first == true
+                                                  ? TextDecoration.lineThrough
+                                                  : TextDecoration.none),
+                                    ),
+                                    trailing: UserModel.currentUser.userType ==
+                                            UserRoles.EMPLOYEE.name
+                                        ? Checkbox(
+                                            value: module.values.first,
+                                            onChanged: (value) {
+                                              projectProvider
+                                                  .updateModuleInFirebase(
+                                                      widget.project.projectId
+                                                          .toString(),
+                                                      index,
+                                                      value as bool);
+                                            },
+                                          )
+                                        : UserModel.currentUser.userType ==
+                                                UserRoles.CLIENT.name
+                                            ? InkWell(
+                                                onTap: () {
+                                                  projectProvider
+                                                      .updateModuleInFirebase(
+                                                          widget
+                                                              .project.projectId
+                                                              .toString(),
+                                                          index,
+                                                          false)
+                                                      .then((value) {
+                                                    projectProvider
+                                                        .updateProjectStatus(
+                                                            widget.project
+                                                                .projectId
+                                                                .toString(),
+                                                            'In Revision');
+                                                  });
+                                                },
+                                                child: Icon(Icons.event_repeat))
+                                            : Checkbox(
+                                                value: module.values.first,
+                                                onChanged: (value) {
+                                                  projectProvider
+                                                      .updateModuleInFirebase(
+                                                          widget
+                                                              .project.projectId
+                                                              .toString(),
+                                                          index,
+                                                          value as bool);
+                                                }),
+                                  );
+                                }),
+                              ),
+                            ),
+                            isExpanded: isModulesExpanded,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            const Text(
-              'Description',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            Text(
-              widget.project.projectDescription.toString(),
-              style: const TextStyle(
-                fontSize: 16,
               ),
             ),
-            const SizedBox(
-              height: 16,
-            ),
-            const Text(
-              'Modules',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: widget.project.modules!.length,
-                itemBuilder: (context, index) {
-                  return Row(
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.1),
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20))),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  const Text(
+                    'Project Progress',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  Stack(
                     children: [
-                      Container(
-                        width: 25,
-                        height: 25,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: MyColors.purpleColor,
-                            width: 2,
+                      Column(
+                        children: [
+                          Container(
+                            height: 50 + 1,
+                            width: (screenWidth),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              border: Border.all(color: Colors.black),
+                            ),
                           ),
+                        ],
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(left: 1),
+                        width: getProgressWidth(screenWidth).toDouble(),
+                        height: 50,
+                        decoration: BoxDecoration(
+                          gradient: MyColors.pinkPurpleGradient,
+                          borderRadius: BorderRadius.circular(50),
+                          border: getProgressCount() == 100
+                              ? Border.all(color: Colors.black)
+                              : null,
                         ),
                         child: Center(
                           child: Text(
-                            (index + 1).toString(),
-                            style: const TextStyle(height: 0),
+                            '${getProgressCount().toString()}%',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      widget.project.modules?[index] != null
-                          ? Text(
-                              widget.project.modules![index].keys
-                                  .toList()
-                                  .first,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                decoration: widget
-                                            .project.modules![index].values
-                                            .toList()
-                                            .first ==
-                                        false
-                                    ? TextDecoration.none
-                                    : TextDecoration.lineThrough,
-                              ),
-                            )
-                          : const Text('data'),
-                      IconButton(
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: const Text('Change Module Status'),
-                                    content: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        RadioListTile(
-                                          title: const Text('Not Completed'),
-                                          value: 'Not Completed',
-                                          groupValue: widget.project
-                                                      .modules![index].values
-                                                      .toList()
-                                                      .first ==
-                                                  true
-                                              ? 'Completed'
-                                              : 'Not Completed',
-                                          onChanged: (String? newValue) {},
-                                        ),
-                                        RadioListTile(
-                                          title: const Text('Completed'),
-                                          value: 'Completed',
-                                          groupValue: widget.project
-                                                      .modules![index].values
-                                                      .toList()
-                                                      .first ==
-                                                  true
-                                              ? 'Completed'
-                                              : 'Not Completed',
-                                          onChanged: (String? newValue) {},
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                });
-                          },
-                          icon: const Icon(
-                            Icons.edit,
-                          )),
                     ],
-                  );
-                },
-              ),
-            ),
-            const SizedBox(
-              height: 16,
-            ),
-            const Text(
-              'Project Progress',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(
-              height: 16,
-            ),
-            Stack(
-              alignment: Alignment.centerLeft,
-              children: [
-                Container(
-                  height: 50 + 1,
-                  width: (screenWidth),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    border: Border.all(color: Colors.black),
                   ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(left: 1),
-                  width: getProgressWidth(screenWidth).toDouble(),
-                  height: 50,
-                  decoration: BoxDecoration(
-                    gradient: MyColors.pinkPurpleGradient,
-                    borderRadius: BorderRadius.circular(50),
-                    border: getProgressCount() == 100
-                        ? Border.all(color: Colors.black)
-                        : null,
+                  CustomTimerWidget(
+                    endDate: widget.project.deadline as DateTime,
                   ),
-                  child: Center(
-                    child: Text(
-                      '${getProgressCount().toString()}%',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: MyColors.purpleColor),
+                          child: Text(
+                            'Cancel Project',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: MyColors.pinkColor),
+                          child: Text(
+                            'Complete Project',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
-            ),
-            CustomTimerWidget(
-              days: DateTime.now().day,
-              hours: DateTime.now().hour,
-              minutes: DateTime.now().month,
-              seconds: DateTime.now().second,
-            ),
+                ],
+              ),
+            )
           ],
         ),
       ),
-    ));
+    );
   }
 }
 
 class CustomTimerWidget extends StatefulWidget {
   const CustomTimerWidget({
     super.key,
-    required this.days,
-    required this.hours,
-    required this.minutes,
-    required this.seconds,
+    required this.endDate,
   });
 
-  final int days;
-  final int hours;
-  final int minutes;
-  final int seconds;
+  final DateTime endDate;
 
   @override
   State<CustomTimerWidget> createState() => _CustomTimerWidgetState();
@@ -288,16 +398,34 @@ class _CustomTimerWidgetState extends State<CustomTimerWidget> {
     super.initState();
     customTimerProvider =
         Provider.of<CustomTimerProvider>(context, listen: false);
-    customTimerProvider.setTime(
-      days: widget.days,
-      hours: widget.hours,
-      minutes: widget.minutes,
-      seconds: widget.seconds,
-    );
+
+    _initializeTimer();
+
     _streamSubscription = customTimerProvider.timerStream.listen((_) {
       setState(() {});
     });
-    customTimerProvider.startTimer();
+
+    // Check if the project is already overdue before starting the timer
+    if (!checkIfOverdue(widget.endDate)) {
+      customTimerProvider.startTimer();
+    }
+  }
+
+  void _initializeTimer() {
+    final now = DateTime.now();
+    final difference = widget.endDate.difference(now);
+
+    customTimerProvider.setTime(
+      days: difference.inDays,
+      hours: difference.inHours % 24,
+      minutes: difference.inMinutes % 60,
+      seconds: difference.inSeconds % 60,
+    );
+  }
+
+  bool checkIfOverdue(DateTime deadline) {
+    DateTime now = DateTime.now();
+    return now.isAfter(deadline);
   }
 
   @override

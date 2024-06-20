@@ -1,82 +1,155 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:outsource_mate/models/project_model.dart';
 import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/signin_provider.dart';
 
 class ProjectProvider extends ChangeNotifier {
-  List<ProjectModel> _projectsList = [];
+  FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+  final List<ProjectModel> _projectsList = [];
 
   List<ProjectModel> get projectsList => _projectsList;
 
-  List<Map<String,bool>> modules = [];
+  List<Map<String, bool>> modules = [];
   String? fileUrl;
 
-  void addModule(Map<String,bool> module){
+  void addModule(Map<String, bool> module) {
     modules.add(module);
     notifyListeners();
   }
 
-  void addFileUrl(String url){
+  void addFileUrl(String url) {
     fileUrl = url;
     notifyListeners();
   }
 
-  void getProjects(String email, String collection) async {
-    print("Getting Projects");
-    EasyLoading.show(status: 'Fetching Projects');
-    final DocumentSnapshot result = await FirebaseFirestore.instance
-        .collection(collection)
-        .where('email', isEqualTo: email)
-        .limit(1)
-        .get()
-        .then((querySnapshot) => querySnapshot.docs.first);
+  Future<void> updateModuleInFirebase(
+      String projectId, int index, bool newValue) async {
+    try {
+      QuerySnapshot querySnapshot = await firebaseFirestore
+          .collection('projects')
+          .where('projectId', isEqualTo: projectId)
+          .get();
 
-    if (!result.exists) {
-      EasyLoading.dismiss();
-      return null;
-    } else {
-      final Map<String, dynamic> userData = result.data() as Map<String, dynamic>;
-      final List<dynamic> projectsData = userData['projects'] ?? [];
-      final List<ProjectModel> projects = projectsData.map((projectData) => ProjectModel.fromJson(projectData)).toList();
-      _projectsList = projects;
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot doc = querySnapshot.docs.first;
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        ProjectModel project = ProjectModel.fromJson(data);
+
+        project.updateModuleByIndex(index, newValue);
+
+        await firebaseFirestore
+            .collection('projects')
+            .doc(doc.id)
+            .update(project.toJson());
+        getProjects();
+        notifyListeners();
+        print('Module updated successfully.');
+      } else {
+        print('Project with given projectId does not exist.');
+      }
+    } catch (e) {
+      print('Error updating module: $e');
     }
-    EasyLoading.dismiss();
-    notifyListeners();
   }
 
-  String getCollectionName(String userRole){
-    if(userRole==UserRoles.FREELANCER.name){
-      return 'freelancers';
-    }else if(userRole==UserRoles.CLIENT.name){
-      return 'clients';
+  Future<void> updateProjectStatus(
+    String projectId,
+    String status,
+  ) async {
+    try {
+      QuerySnapshot querySnapshot = await firebaseFirestore
+          .collection('projects')
+          .where('projectId', isEqualTo: projectId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot doc = querySnapshot.docs.first;
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        ProjectModel project = ProjectModel.fromJson(data);
+        project.projectStatus = status;
+        await firebaseFirestore
+            .collection('projects')
+            .doc(doc.id)
+            .update(project.toJson());
+        getProjects();
+        notifyListeners();
+        print('Project Staus Changed to $status successfully.');
+      } else {
+        print('Project with given projectId does not exist.');
+      }
+    } catch (e) {
+      print('Error updating module: $e');
     }
-    else if(userRole==UserRoles.EMPLOYEE.name){
+  }
+
+  Future<void> getProjects() async {
+    print("Getting Projects");
+    EasyLoading.show(status: 'Fetching Projects');
+
+    try {
+      String emailField;
+
+      switch (UserModel.currentUser.userType) {
+        case 'CLIENT':
+          emailField = 'clientEmail';
+          break;
+        case 'FREELANCER':
+          emailField = 'freelancerEmail';
+          break;
+        case 'EMPLOYEE':
+          emailField = 'employeeEmail';
+          break;
+        default:
+          throw Exception("Invalid user type");
+      }
+
+      QuerySnapshot<Map<String, dynamic>> response = await firebaseFirestore
+          .collection("projects")
+          .where(emailField, isEqualTo: UserModel.currentUser.email)
+          .get();
+
+      projectsList.clear();
+      for (var project in response.docs) {
+        projectsList.add(ProjectModel.fromJson(project.data()));
+      }
+    } catch (e) {
+      print(e.toString());
+    } finally {
+      EasyLoading.dismiss();
+      notifyListeners();
+    }
+  }
+
+  String getCollectionName(String userRole) {
+    if (userRole == UserRoles.FREELANCER.name) {
+      return 'freelancers';
+    } else if (userRole == UserRoles.CLIENT.name) {
+      return 'clients';
+    } else if (userRole == UserRoles.EMPLOYEE.name) {
       return 'employees';
-    }else{
+    } else {
       return 'N/A';
     }
   }
-  void addProject(ProjectModel project) async{
-    final QuerySnapshot result = await FirebaseFirestore.instance
-        .collection(getCollectionName(UserModel.currentUser.userType))
-        .where('email', isEqualTo: UserModel.currentUser.email)
-        .limit(1)
-        .get();
 
-    if (result.docs.isEmpty) {
-      throw Exception('User not found');
+  Future<void> addProject(ProjectModel project, BuildContext context) async {
+    EasyLoading.show(status: 'Addding Project');
+    try {
+      firebaseFirestore.collection("projects").add(project.toJson());
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Project Added Successfully")));
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString())));
     }
-
-    final DocumentSnapshot document = result.docs.first;
-    final Map<String, dynamic> userData = document.data() as Map<String, dynamic>;
-    final List<dynamic> projects = userData['projects'] ?? [];
-    projects.add(project.toJson());
-
-    await document.reference.update({
-      'projects': projects,
-    });
+    EasyLoading.dismiss();
   }
 
   int getProjectsTypeCount(String type) {
@@ -87,12 +160,12 @@ class ProjectProvider extends ChangeNotifier {
     return filteredProjects.length;
   }
 
-
-
   int selectedProjectIndex = -1;
 
-  void updateIndex(int index){
+  void updateIndex(int index) {
     selectedProjectIndex = index;
     notifyListeners();
   }
+
+  
 }

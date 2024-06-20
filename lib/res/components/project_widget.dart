@@ -4,22 +4,18 @@ import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 
 class ProjectWidget extends StatelessWidget {
-  const ProjectWidget({super.key,
-    required this.projectModel
-  });
+  const ProjectWidget({super.key, required this.projectModel});
 
   final ProjectModel projectModel;
-
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return InkWell(
-      onTap: (){
-        Navigator.pushNamed(context, RouteName.projectDetailsScreen,arguments: {
-          'project': projectModel
-        });
+      onTap: () {
+        Navigator.pushNamed(context, RouteName.projectDetailsScreen,
+            arguments: {'project': projectModel});
       },
       child: Container(
         width: width,
@@ -54,14 +50,18 @@ class ProjectWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    UserModel.currentUser.userType=='CLIENT'?'Freelancer Name: ':UserModel.currentUser.userType=='FREELANCER'?'Employee Name':'Freelancer Name',
+                    UserModel.currentUser.userType == 'CLIENT'
+                        ? 'Freelancer Email: '
+                        : UserModel.currentUser.userType == 'FREELANCER'
+                            ? 'Employee Email'
+                            : 'Freelancer Name',
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    projectModel.employeeName.toString(),
+                    projectModel.employeeEmail.toString(),
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,

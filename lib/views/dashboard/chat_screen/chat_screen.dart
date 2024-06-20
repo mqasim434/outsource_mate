@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -103,11 +104,9 @@ class ChatScreen extends StatelessWidget {
                             color: Colors.red,
                           ),
                         );
-                      }else if(!snapshot.hasData){
+                      } else if (!snapshot.hasData) {
                         return CircularProgressIndicator();
-                      }
-
-                      else if (snapshot.data!.docs.isEmpty) {
+                      } else if (snapshot.data!.docs.isEmpty) {
                         return const Center(
                           child: Text(
                             'No Messages Yet!',
@@ -138,11 +137,13 @@ class ChatScreen extends StatelessWidget {
                             physics: const BouncingScrollPhysics(),
                             itemBuilder: (context, index) {
                               var message = messages[index];
-                              String time = message['timestamp']!=null? message['timestamp']
-                                  .toDate()
-                                  .toString()
-                                  .split(' ')[1]
-                                  .split('.')[0]:'';
+                              String time = message['timestamp'] != null
+                                  ? message['timestamp']
+                                      .toDate()
+                                      .toString()
+                                      .split(' ')[1]
+                                      .split('.')[0]
+                                  : '';
                               String amPm = int.parse(time.split(':')[0]) >= 12
                                   ? 'PM'
                                   : 'AM';
@@ -358,6 +359,16 @@ class ChatScreen extends StatelessWidget {
                               isDocument: false,
                             );
                             chatProvider.sendMessage(messageModel);
+                            NotificationServices notificationServices =
+                                NotificationServices();
+                            notificationServices
+                                .showNotification(
+                                  RemoteMessage(data: {
+                              'title':
+                                  'New Message from ${UserModel.currentUser.email}',
+                              'message': messageController.text,
+                              'token': otherUser.deviceToken,
+                            }));
                             messageController.clear();
                           }
                         },

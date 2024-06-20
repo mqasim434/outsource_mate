@@ -1,3 +1,6 @@
+
+
+
 plugins {
     id "com.android.application"
     id "kotlin-android"
@@ -25,11 +28,12 @@ if (flutterVersionName == null) {
 android {
     namespace "com.shopifyistic.outsource_mate"
     compileSdk flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    ndkVersion "25.1.8937393"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
@@ -75,4 +79,5 @@ dependencies {
             because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
         }
     }
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
 }

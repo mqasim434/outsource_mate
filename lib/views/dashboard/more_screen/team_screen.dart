@@ -191,10 +191,7 @@ class _TeamMemberWidgetState extends State<TeamMemberWidget> {
   void initState() {
     // TODO: implement initState
     projectProvider = Provider.of<ProjectProvider>(context, listen: false);
-    projectProvider.getProjects(
-        UserModel.currentUser.email.toString(),
-        UtilityFunctions.getCollectionName(
-            UserModel.currentUser.userType.toString()));
+    projectProvider.getProjects();
     super.initState();
   }
 

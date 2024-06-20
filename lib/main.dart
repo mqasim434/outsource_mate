@@ -6,6 +6,7 @@ import 'package:outsource_mate/providers/chat_provider.dart';
 import 'package:outsource_mate/providers/client_provider.dart';
 import 'package:outsource_mate/providers/custom_timer_provider.dart';
 import 'package:outsource_mate/providers/freelancersProvider.dart';
+import 'package:outsource_mate/providers/notifications_provider.dart';
 import 'package:outsource_mate/providers/otp_provider.dart';
 import 'package:outsource_mate/providers/profile_provider.dart';
 import 'package:outsource_mate/providers/project_provider.dart';
@@ -49,6 +50,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ClientProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => CustomTimerProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationsProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -60,7 +62,6 @@ class MyApp extends StatelessWidget {
         builder: EasyLoading.init(),
         initialRoute: RouteName.splashScreen,
         onGenerateRoute: Routes.generateRoute,
-
       ),
     );
   }

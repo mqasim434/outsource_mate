@@ -1,8 +1,32 @@
-import 'package:flutter/material.dart';
-import 'package:outsource_mate/res/myColors.dart';
+// ignore_for_file: prefer_const_constructors
 
-class NotificationsScreen extends StatelessWidget {
-  const NotificationsScreen({super.key});
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:outsource_mate/models/notification_model.dart';
+import 'package:outsource_mate/models/user_model.dart';
+import 'package:outsource_mate/providers/notifications_provider.dart';
+import 'package:outsource_mate/res/myColors.dart';
+import 'package:outsource_mate/utils/enums.dart';
+import 'package:provider/provider.dart';
+
+class NotificationsScreen extends StatefulWidget {
+  NotificationsScreen({super.key});
+
+  @override
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends State<NotificationsScreen> {
+  NotificationsProvider notificationsProvider = NotificationsProvider();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    notificationsProvider =
+        Provider.of<NotificationsProvider>(context, listen: false);
+    notificationsProvider.fetchNotifications();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,18 +43,33 @@ class NotificationsScreen extends StatelessWidget {
         ),
         elevation: 0,
       ),
-      body: Expanded(
-        child: ListView.builder(
-            itemCount: 10,
-            itemBuilder: (context,index){
-          return NotificationWidget(
-            notificationTitle: 'New Project',
-            notificationDescription: 'Create an app Outsource Mate',
-            notificationType: (index%2==0)?NotificationType.project:NotificationType.review,
-            onTap: (){},
-          );
-        }),
-      )
+      body: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('notifications')
+              .where('userId', isEqualTo: UserModel.currentUser.email)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else if (snapshot.hasData) {
+              var notifications = snapshot.data!.docs;
+              return ListView.builder(
+                itemCount: notifications.length,
+                itemBuilder: (context, index) {
+                  var notification = notifications[index];
+                  return NotificationWidget(
+                      notificationTitle: notification['title'],
+                      notificationDescription: notification['description'],
+                      notificationType: notification['notificationType'],
+                      onTap: () {});
+                },
+              );
+            } else {
+              return Center(
+                child: Text('No Notifications Yet'),
+              );
+            }
+          }),
     ));
   }
 }
@@ -46,31 +85,29 @@ class NotificationWidget extends StatelessWidget {
 
   final String? notificationTitle;
   final String? notificationDescription;
-  final NotificationType? notificationType;
+  final String? notificationType;
   final void Function() onTap;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Card(
-        color: notificationType == NotificationType.project
-            ? MyColors.pinkColor
-            : MyColors.purpleColor,
-        child: ListTile(
-          leading: notificationType == NotificationType.project
-              ? const Icon(Icons.task)
-              : const Icon(Icons.notifications),
-          title: Text(notificationTitle.toString()),
-          subtitle: Text(notificationDescription.toString()),
-          trailing: const Icon(Icons.arrow_forward_ios),
+    return Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: InkWell(
+        onTap: onTap,
+        child: Card(
+          color: notificationType == NotificationTypes.PROJECT.name
+              ? MyColors.pinkColor
+              : MyColors.purpleColor,
+          child: ListTile(
+            leading: notificationType == NotificationTypes.PROJECT.name
+                ? const Icon(Icons.task)
+                : const Icon(Icons.notifications),
+            title: Text(notificationTitle.toString()),
+            subtitle: Text(notificationDescription.toString()),
+            trailing: const Icon(Icons.arrow_forward_ios),
+          ),
         ),
       ),
     );
   }
-}
-
-enum NotificationType {
-  project,
-  review,
 }
