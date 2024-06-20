@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class NotificationServices {
   FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
@@ -29,8 +30,7 @@ class NotificationServices {
   }
 
   showNotification(RemoteMessage message) async {
-    const String projectId =
-        'outsource-mate-f4c50'; // Replace with your actual Firebase project ID
+    String projectId = dotenv.env['PROJECT_ID']!;
     final String jsonCredentials = await rootBundle
         .loadString('assets/outsource-mate-f4c50-797eec49eae5.json');
     final creds = auth.ServiceAccountCredentials.fromJson(jsonCredentials);
