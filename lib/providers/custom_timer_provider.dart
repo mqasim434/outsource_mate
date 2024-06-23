@@ -30,6 +30,9 @@ class CustomTimerProvider with ChangeNotifier {
     _seconds = seconds;
 
     _streamController.add(null);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   void startTimer() {
@@ -41,6 +44,9 @@ class CustomTimerProvider with ChangeNotifier {
       if (_days == 0 && _hours == 0 && _minutes == 0 && _seconds == 0) {
         timer.cancel();
         _timer = null;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          notifyListeners();
+        });
         return;
       }
 
@@ -61,6 +67,9 @@ class CustomTimerProvider with ChangeNotifier {
       }
 
       _streamController.add(null);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
     });
   }
 
@@ -71,6 +80,9 @@ class CustomTimerProvider with ChangeNotifier {
 
     _timer!.cancel();
     _timer = null;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 
   @override

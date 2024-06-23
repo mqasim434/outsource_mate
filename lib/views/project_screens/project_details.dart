@@ -68,11 +68,21 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     super.initState();
     projectStatus = widget.project.projectStatus;
     print(projectStatus);
-    if (projectStatus != 'Completed' &&
-        checkIfOverdue(widget.project.deadline as DateTime)) {
-      projectProvider.updateProjectStatus(
-          widget.project.projectId.toString(), 'Overdue');
-    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (projectStatus != 'Completed' &&
+          projectStatus != 'Overdue' &&
+          checkIfOverdue(widget.project.deadline as DateTime)) {
+        _updateProjectStatusToOverdue();
+      }
+    });
+  }
+
+  Future<void> _updateProjectStatusToOverdue() async {
+    await projectProvider.updateProjectStatus(
+      widget.project.projectId.toString(),
+      'Overdue',
+    );
   }
 
   bool isDescriptionExpanded = false;
@@ -100,7 +110,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SizedBox(
-              height: screenHeight * 0.53,
+              height: screenHeight * 0.50,
               child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
@@ -389,7 +399,8 @@ class CustomTimerWidget extends StatefulWidget {
   State<CustomTimerWidget> createState() => _CustomTimerWidgetState();
 }
 
-class _CustomTimerWidgetState extends State<CustomTimerWidget> {
+class _CustomTimerWidgetState extends State<CustomTimerWidget>
+    with TickerProviderStateMixin {
   late CustomTimerProvider customTimerProvider;
   late StreamSubscription<dynamic> _streamSubscription;
 
@@ -400,12 +411,6 @@ class _CustomTimerWidgetState extends State<CustomTimerWidget> {
         Provider.of<CustomTimerProvider>(context, listen: false);
 
     _initializeTimer();
-
-    _streamSubscription = customTimerProvider.timerStream.listen((_) {
-      setState(() {});
-    });
-
-    // Check if the project is already overdue before starting the timer
     if (!checkIfOverdue(widget.endDate)) {
       customTimerProvider.startTimer();
     }
@@ -415,12 +420,21 @@ class _CustomTimerWidgetState extends State<CustomTimerWidget> {
     final now = DateTime.now();
     final difference = widget.endDate.difference(now);
 
-    customTimerProvider.setTime(
-      days: difference.inDays,
-      hours: difference.inHours % 24,
-      minutes: difference.inMinutes % 60,
-      seconds: difference.inSeconds % 60,
-    );
+    if (difference.isNegative) {
+      customTimerProvider.setTime(
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+      );
+    } else {
+      customTimerProvider.setTime(
+        days: difference.inDays,
+        hours: difference.inHours % 24,
+        minutes: difference.inMinutes % 60,
+        seconds: difference.inSeconds % 60,
+      );
+    }
   }
 
   bool checkIfOverdue(DateTime deadline) {
@@ -436,27 +450,26 @@ class _CustomTimerWidgetState extends State<CustomTimerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<dynamic>(
-      stream: customTimerProvider.timerStream,
-      builder: (context, snapshot) {
+    return Consumer<CustomTimerProvider>(
+      builder: (context, timerProvider, child) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             TimerDisplayBox(
               label: "Days",
-              digit: customTimerProvider.days.toString(),
+              digit: timerProvider.days.toString(),
             ),
             TimerDisplayBox(
               label: "Hours",
-              digit: customTimerProvider.hours.toString(),
+              digit: timerProvider.hours.toString(),
             ),
             TimerDisplayBox(
               label: "Minutes",
-              digit: customTimerProvider.minutes.toString(),
+              digit: timerProvider.minutes.toString(),
             ),
             TimerDisplayBox(
               label: "Seconds",
-              digit: customTimerProvider.seconds.toString(),
+              digit: timerProvider.seconds.toString(),
             ),
           ],
         );
