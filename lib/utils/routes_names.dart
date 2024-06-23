@@ -31,4 +31,6 @@ class RouteName{
   static const String projectDetailsScreen = 'projectDetails';
 
   static const String notifications = 'notifications';
+  
+  static const String aiChatRoom = 'aiChatRoom';
 }

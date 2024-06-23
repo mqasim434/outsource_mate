@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:outsource_mate/models/project_model.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
+import 'package:outsource_mate/views/dashboard/chat_screen/ai_chat_room.dart';
 import 'package:outsource_mate/views/dashboard/chat_screen/chat_screen.dart';
 import 'package:outsource_mate/views/dashboard/chat_screen/inbox_screen.dart';
 import 'package:outsource_mate/views/dashboard/dashboard.dart';
@@ -17,6 +18,7 @@ import 'package:outsource_mate/views/registration_screens/forgot_screens/otp_inp
 import 'package:outsource_mate/views/registration_screens/signin_screen.dart';
 import 'package:outsource_mate/views/registration_screens/signup_screen.dart';
 import 'package:outsource_mate/views/splash_screen/splash_screen.dart';
+
 // ingore_for_file: prefer_const_constructors
 class Routes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -28,7 +30,7 @@ class Routes {
           builder: (_) => const SplashScreen(),
         );
 
-        case RouteName.introScreen:
+      case RouteName.introScreen:
         return MaterialPageRoute(
           builder: (_) => const IntroScreen(),
         );
@@ -100,14 +102,21 @@ class Routes {
           builder: (_) => const NewPasswordScreen(),
         );
 
-        case RouteName.projectDetailsScreen:
-          Map<String, dynamic> data = arguments as Map<String, dynamic>;
-          ProjectModel project = data['project'] as ProjectModel;
+      case RouteName.aiChatRoom:
         return MaterialPageRoute(
-          builder: (_) => ProjectDetailsScreen(project: project,),
+          builder: (_) => const AiChatRoom(),
         );
 
-        case RouteName.notifications:
+      case RouteName.projectDetailsScreen:
+        Map<String, dynamic> data = arguments as Map<String, dynamic>;
+        ProjectModel project = data['project'] as ProjectModel;
+        return MaterialPageRoute(
+          builder: (_) => ProjectDetailsScreen(
+            project: project,
+          ),
+        );
+
+      case RouteName.notifications:
         return MaterialPageRoute(
           builder: (_) => NotificationsScreen(),
         );
