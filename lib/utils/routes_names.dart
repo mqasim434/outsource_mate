@@ -1,5 +1,4 @@
-
-class RouteName{
+class RouteName {
   static const String splashScreen = 'splash';
 
   static const String signupScreen = 'signup';
@@ -31,6 +30,10 @@ class RouteName{
   static const String projectDetailsScreen = 'projectDetails';
 
   static const String notifications = 'notifications';
-  
+
   static const String aiChatRoom = 'aiChatRoom';
+
+  static const String addReviewScreen = 'addReview';
+
+  static const String reviewsScreen = 'reviews';
 }

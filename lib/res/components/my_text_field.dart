@@ -9,12 +9,14 @@ class MyTextField extends StatelessWidget {
     required this.textFieldController,
     this.isPassword = false,
     this.isDescription = false,
+    required this.validator,
   });
 
   final String hintText;
   final bool isPassword;
   final bool isDescription;
   final TextEditingController textFieldController;
+  final String? Function(String?) validator;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +53,7 @@ class MyTextField extends StatelessWidget {
           bottom: 15,
         ),
       ),
+      validator: validator,
     );
   }
 }

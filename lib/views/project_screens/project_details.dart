@@ -1,8 +1,9 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
+// ignore_for_file: prefer_const_constructors
 
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:intl/intl.dart';
 import 'package:outsource_mate/models/project_model.dart';
 import 'package:outsource_mate/models/user_model.dart';
@@ -10,6 +11,7 @@ import 'package:outsource_mate/providers/custom_timer_provider.dart';
 import 'package:outsource_mate/providers/project_provider.dart';
 import 'package:outsource_mate/providers/signin_provider.dart';
 import 'package:outsource_mate/res/myColors.dart';
+import 'package:outsource_mate/utils/routes_names.dart';
 import 'package:provider/provider.dart';
 
 class ProjectDetailsScreen extends StatefulWidget {
@@ -21,7 +23,8 @@ class ProjectDetailsScreen extends StatefulWidget {
   State<ProjectDetailsScreen> createState() => _ProjectDetailsScreenState();
 }
 
-class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
+class _ProjectDetailsScreenState extends State<ProjectDetailsScreen>
+    with SingleTickerProviderStateMixin {
   DateFormat dateFormat = DateFormat("MM/dd/yyyy hh:mm a");
 
   int getProgressCount() {
@@ -59,7 +62,6 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
   bool checkIfOverdue(DateTime deadline) {
     DateTime now = DateTime.now();
-    print(now.isAfter(deadline));
     return now.isAfter(deadline);
   }
 
@@ -67,7 +69,6 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   void initState() {
     super.initState();
     projectStatus = widget.project.projectStatus;
-    print(projectStatus);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (projectStatus != 'Completed' &&
@@ -87,10 +88,28 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
   bool isDescriptionExpanded = false;
   bool isModulesExpanded = false;
+  bool isReviewsExpanded = false;
+  bool isFilesExpanded = false;
 
   @override
   Widget build(BuildContext context) {
     initializeProvider(context);
+
+    List<Map<String, String>> filesList = [
+      {
+        'fileName': 'File1.png',
+        'fileUrl': 'File1.png',
+      },
+      {
+        'fileName': 'File2.png',
+        'fileUrl': 'File2.png',
+      },
+      {
+        'fileName': 'File3.png',
+        'fileUrl': 'File3.png',
+      },
+    ];
+
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     return SafeArea(
@@ -133,58 +152,56 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                       SizedBox(
                         height: 10,
                       ),
-                      UserModel.currentUser.userType == 'Employee'
-                          ? SizedBox()
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Project Status: ',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Chip(
-                                  label: Text(
-                                    widget.project.projectStatus.toString(),
-                                  ),
-                                  backgroundColor: MyColors.pinkColor,
-                                ),
-                                // DropdownButton(
-                                //   style: TextStyle(
-                                //       fontSize: 14, color: Colors.black),
-                                //   underline: null,
-                                //   value: projectStatus,
-                                //   items: [
-                                //     const DropdownMenuItem(
-                                //       value: 'In Progress',
-                                //       child: Text('In Progress'),
-                                //     ),
-                                //     const DropdownMenuItem(
-                                //       value: 'In Revision',
-                                //       child: Text('In Revision'),
-                                //     ),
-                                //     const DropdownMenuItem(
-                                //       value: 'Completed',
-                                //       child: Text('Completed'),
-                                //     ),
-                                //     const DropdownMenuItem(
-                                //       value: 'Cancelled',
-                                //       child: Text('Cancelled'),
-                                //     ),
-                                //   ],
-                                //   onChanged: (value) {
-                                //     projectStatus = value;
-                                //     setState(() {});
-                                //   },
-                                // )
-                              ],
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Project Status: ',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
                             ),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Chip(
+                            label: Text(
+                              widget.project.projectStatus.toString(),
+                            ),
+                            backgroundColor: MyColors.pinkColor,
+                          ),
+                          // DropdownButton(
+                          //   style: TextStyle(
+                          //       fontSize: 14, color: Colors.black),
+                          //   underline: null,
+                          //   value: projectStatus,
+                          //   items: [
+                          //     const DropdownMenuItem(
+                          //       value: 'In Progress',
+                          //       child: Text('In Progress'),
+                          //     ),
+                          //     const DropdownMenuItem(
+                          //       value: 'In Revision',
+                          //       child: Text('In Revision'),
+                          //     ),
+                          //     const DropdownMenuItem(
+                          //       value: 'Completed',
+                          //       child: Text('Completed'),
+                          //     ),
+                          //     const DropdownMenuItem(
+                          //       value: 'Cancelled',
+                          //       child: Text('Cancelled'),
+                          //     ),
+                          //   ],
+                          //   onChanged: (value) {
+                          //     projectStatus = value;
+                          //     setState(() {});
+                          //   },
+                          // )
+                        ],
+                      ),
                       SizedBox(
                         height: 20,
                       ),
@@ -195,6 +212,10 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                               isDescriptionExpanded = !isDescriptionExpanded;
                             } else if (index == 1) {
                               isModulesExpanded = !isModulesExpanded;
+                            } else if (index == 2) {
+                              isFilesExpanded = !isFilesExpanded;
+                            } else if (index == 3) {
+                              isReviewsExpanded = !isReviewsExpanded;
                             }
                           });
                         },
@@ -285,6 +306,54 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                             ),
                             isExpanded: isModulesExpanded,
                           ),
+                          ExpansionPanel(
+                            headerBuilder:
+                                (BuildContext context, bool isExpanded) {
+                              return ListTile(
+                                title: Text('Files'),
+                              );
+                            },
+                            body: widget.project.files != null
+                                ? SizedBox(
+                                    height: 200,
+                                    child: ListView.builder(
+                                        itemCount: widget.project.files!.length,
+                                        itemBuilder: (context, index) {
+                                          return ListTile(
+                                            title: Text(
+                                              style: TextStyle(fontSize: 10),
+                                              widget.project
+                                                  .files![index]['fileName']
+                                                  .toString(),
+                                            ),
+                                            trailing: Icon(Icons.download),
+                                          );
+                                        }),
+                                  )
+                                : Text("No Files Found"),
+                            isExpanded: isFilesExpanded,
+                          ),
+                          if (widget.project.projectStatus == 'Completed')
+                            ExpansionPanel(
+                              headerBuilder:
+                                  (BuildContext context, bool isExpanded) {
+                                return ListTile(
+                                  title: Text('Review'),
+                                );
+                              },
+                              body: ListTile(
+                                subtitle: Text(
+                                  widget.project.review != null
+                                      ? widget.project.review!['comment']
+                                      : "No Comment Given".toString(),
+                                ),
+                                title: RatingStars(
+                                  starCount: 5,
+                                  value: widget.project.review!['rating'],
+                                ),
+                              ),
+                              isExpanded: isReviewsExpanded,
+                            ),
                         ],
                       ),
                     ],
@@ -351,32 +420,50 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                   CustomTimerWidget(
                     endDate: widget.project.deadline as DateTime,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: MyColors.purpleColor),
-                          child: Text(
-                            'Cancel Project',
-                            style: TextStyle(color: Colors.white),
+                  UserModel.currentUser.userType == 'CLIENT'
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  projectProvider.updateProjectStatus(
+                                      widget.project.projectId.toString(),
+                                      'Cancelled');
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: MyColors.purpleColor),
+                                child: Text(
+                                  'Cancel Project',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  projectProvider
+                                      .updateProjectStatus(
+                                          widget.project.projectId.toString(),
+                                          'Completed')
+                                      .then((value) {
+                                    Navigator.pushNamed(
+                                        context, RouteName.addReviewScreen,
+                                        arguments: {
+                                          'projectId': widget.project.projectId,
+                                        });
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: MyColors.pinkColor),
+                                child: Text(
+                                  'Complete Project',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: MyColors.pinkColor),
-                          child: Text(
-                            'Complete Project',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                        )
+                      : SizedBox(),
                 ],
               ),
             )
@@ -414,6 +501,10 @@ class _CustomTimerWidgetState extends State<CustomTimerWidget>
     if (!checkIfOverdue(widget.endDate)) {
       customTimerProvider.startTimer();
     }
+
+    _streamSubscription = customTimerProvider.timerStream.listen((event) {
+      setState(() {});
+    });
   }
 
   void _initializeTimer() {

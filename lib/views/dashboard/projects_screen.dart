@@ -15,11 +15,10 @@ class ProjectsScreen extends StatefulWidget {
 class _ProjectsScreenState extends State<ProjectsScreen> {
   ProjectProvider projectsProvider = ProjectProvider();
 
-
   @override
   void initState() {
     // TODO: implement initState
-    projectsProvider = Provider.of<ProjectProvider>(context,listen: false);
+    projectsProvider = Provider.of<ProjectProvider>(context, listen: false);
     super.initState();
   }
 
@@ -70,6 +69,15 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                     label: 'Completed',
                     count: projectsProvider
                         .getProjectsTypeCount('Completed')
+                        .toString(),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  ProjectsFilterWidget(
+                    label: 'Overdue',
+                    count: projectsProvider
+                        .getProjectsTypeCount('Overdue')
                         .toString(),
                   ),
                   const SizedBox(

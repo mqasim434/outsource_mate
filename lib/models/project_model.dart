@@ -9,23 +9,24 @@ class ProjectModel {
   DateTime? deadline;
   String? projectStatus;
   List<Map<String, bool>>? modules;
-  String? fileUrl;
+  List<Map<String, String>>? files;
+  Map<String, dynamic>? review;
 
   // Static counter to keep track of project IDs
   static int _counter = 1;
 
-  ProjectModel({
-    this.projectTitle,
-    this.projectDescription,
-    this.employeeEmail,
-    this.freelancerEmail,
-    this.clientEmail,
-    this.startingTime,
-    this.deadline,
-    this.projectStatus,
-    this.modules,
-    this.fileUrl,
-  }) {
+  ProjectModel(
+      {this.projectTitle,
+      this.projectDescription,
+      this.employeeEmail,
+      this.freelancerEmail,
+      this.clientEmail,
+      this.startingTime,
+      this.deadline,
+      this.projectStatus,
+      this.modules,
+      this.files,
+      this.review}) {
     // Automatically assign projectId
     projectId = 'OM_P_${_counter++}';
   }
@@ -40,11 +41,15 @@ class ProjectModel {
     startingTime = DateTime.parse(json['startingTime']);
     deadline = DateTime.parse(json['deadline']);
     projectStatus = json['projectStatus'];
+    review = json['review'];
     modules = json['modules'] != null
         ? List<Map<String, bool>>.from(
             json['modules'].map((x) => Map<String, bool>.from(x)))
         : null;
-    fileUrl = json['fileUrl'];
+    files = json['files'] != null
+        ? List<Map<String, String>>.from(
+            json['files'].map((x) => Map<String, String>.from(x)))
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -59,9 +64,11 @@ class ProjectModel {
     data['deadline'] = deadline!.toIso8601String();
     data['projectStatus'] = projectStatus;
     data['modules'] = modules;
-    data['fileUrl'] = fileUrl;
+    data['files'] = files;
+    data['review'] = review;
     return data;
   }
+
   void updateModuleByIndex(int index, bool newValue) {
     if (modules != null && index >= 0 && index < modules!.length) {
       String key = modules![index].keys.first;

@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,15 +17,15 @@ class ProjectProvider extends ChangeNotifier {
   List<ProjectModel> get projectsList => _projectsList;
 
   List<Map<String, bool>> modules = [];
-  String? fileUrl;
+  List<Map<String, String>> files = [];
 
   void addModule(Map<String, bool> module) {
     modules.add(module);
     notifyListeners();
   }
 
-  void addFileUrl(String url) {
-    fileUrl = url;
+  void addFileUrl(Map<String, String> file) {
+    files.add(file);
     notifyListeners();
   }
 
@@ -89,6 +91,31 @@ class ProjectProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> addReview(String projectId, Map<String, dynamic> review) async {
+    EasyLoading.show(status: 'Adding Review');
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await firebaseFirestore
+              .collection('projects')
+              .where('projectId', isEqualTo: projectId)
+              .limit(1)
+              .get();
+
+      ProjectModel project =
+          ProjectModel.fromJson(querySnapshot.docs.first.data());
+      project.review = review;
+      await firebaseFirestore
+          .collection('projects')
+          .doc(querySnapshot.docs.first.id)
+          .update(project.toJson());
+      notifyListeners();
+      EasyLoading.dismiss();
+    } catch (e) {
+      print(e);
+      EasyLoading.dismiss();
+    }
+  }
+
   Future<void> getProjects() async {
     print("Getting Projects");
     EasyLoading.show(status: 'Fetching Projects');
@@ -119,6 +146,7 @@ class ProjectProvider extends ChangeNotifier {
       for (var project in response.docs) {
         projectsList.add(ProjectModel.fromJson(project.data()));
       }
+      notifyListeners();
     } catch (e) {
       print(e.toString());
     } finally {
@@ -145,6 +173,7 @@ class ProjectProvider extends ChangeNotifier {
       firebaseFirestore.collection("projects").add(project.toJson());
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Project Added Successfully")));
+      notifyListeners();
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.toString())));
@@ -166,6 +195,4 @@ class ProjectProvider extends ChangeNotifier {
     selectedProjectIndex = index;
     notifyListeners();
   }
-
-  
 }

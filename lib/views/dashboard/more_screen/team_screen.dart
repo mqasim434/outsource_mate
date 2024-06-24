@@ -11,15 +11,18 @@ import 'package:outsource_mate/utils/utility_functions.dart';
 import 'package:provider/provider.dart';
 
 class TeamScreen extends StatelessWidget {
-  const TeamScreen({super.key});
+  TeamScreen({super.key});
+
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final phoneController = TextEditingController();
+  final roleController = TextEditingController();
+
+  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     final employeeProvider = Provider.of<EmployeeProvider>(context);
-    final nameController = TextEditingController();
-    final emailController = TextEditingController();
-    final phoneController = TextEditingController();
-    final roleController = TextEditingController();
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -91,6 +94,7 @@ class TeamScreen extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Form(
+                      key: formKey,
                       child: Column(
                         children: [
                           Row(
@@ -116,6 +120,13 @@ class TeamScreen extends StatelessWidget {
                           MyTextField(
                             textFieldController: nameController,
                             hintText: 'Enter Employee Name',
+                            validator: (value) {
+                              if (value.toString().isEmpty) {
+                                return "Employee name can't be empty";
+                              } else {
+                                return null;
+                              }
+                            },
                           ),
                           const SizedBox(
                             height: 10,
@@ -123,6 +134,13 @@ class TeamScreen extends StatelessWidget {
                           MyTextField(
                             textFieldController: emailController,
                             hintText: 'Enter Email',
+                            validator: (value) {
+                              if (value.toString().isEmpty) {
+                                return "Email can't be empty";
+                              } else {
+                                return null;
+                              }
+                            },
                           ),
                           const SizedBox(
                             height: 10,
@@ -130,6 +148,13 @@ class TeamScreen extends StatelessWidget {
                           MyTextField(
                             textFieldController: phoneController,
                             hintText: 'Enter Phone',
+                            validator: (value) {
+                              if (value.toString().isEmpty) {
+                                return "Phone can't be empty";
+                              } else {
+                                return null;
+                              }
+                            },
                           ),
                           const SizedBox(
                             height: 10,
@@ -137,6 +162,13 @@ class TeamScreen extends StatelessWidget {
                           MyTextField(
                             textFieldController: roleController,
                             hintText: 'Enter Employee Role',
+                            validator: (value) {
+                              if (value.toString().isEmpty) {
+                                return "Role can't be empty";
+                              } else {
+                                return null;
+                              }
+                            },
                           ),
                           const SizedBox(
                             height: 40,
@@ -289,13 +321,13 @@ class _TeamMemberWidgetState extends State<TeamMemberWidget> {
                                             .toString()),
                                         leading: Radio(
                                           value: index,
-                                          groupValue: projectProvider.selectedProjectIndex,
+                                          groupValue: projectProvider
+                                              .selectedProjectIndex,
                                           onChanged: (value) {
                                             print(value);
-                                            projectProvider.updateIndex(value as int);
-                                            setState(() {
-                                              
-                                            });
+                                            projectProvider
+                                                .updateIndex(value as int);
+                                            setState(() {});
                                           },
                                         ),
                                       ),
@@ -303,11 +335,20 @@ class _TeamMemberWidgetState extends State<TeamMemberWidget> {
                                   }),
                             ),
                             actions: [
-                              RoundedRectangularButton(buttonText: 'Assign', onPress: (){
-                                freelancersProvider.assignProjectToEmployee(widget.employeeModel.email.toString(), projectProvider.projectsList[projectProvider.selectedProjectIndex]).then((value){
-                                  Navigator.pop(context);
-                                });
-                              }),
+                              RoundedRectangularButton(
+                                  buttonText: 'Assign',
+                                  onPress: () {
+                                    freelancersProvider
+                                        .assignProjectToEmployee(
+                                            widget.employeeModel.email
+                                                .toString(),
+                                            projectProvider.projectsList[
+                                                projectProvider
+                                                    .selectedProjectIndex])
+                                        .then((value) {
+                                      Navigator.pop(context);
+                                    });
+                                  }),
                             ],
                           );
                         });

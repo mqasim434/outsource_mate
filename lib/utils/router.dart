@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:outsource_mate/models/project_model.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
@@ -17,9 +19,11 @@ import 'package:outsource_mate/views/registration_screens/forgot_screens/number_
 import 'package:outsource_mate/views/registration_screens/forgot_screens/otp_input_screen.dart';
 import 'package:outsource_mate/views/registration_screens/signin_screen.dart';
 import 'package:outsource_mate/views/registration_screens/signup_screen.dart';
+import 'package:outsource_mate/views/reviews/add_review_screen.dart';
+import 'package:outsource_mate/views/reviews/reviews_screen.dart';
 import 'package:outsource_mate/views/splash_screen/splash_screen.dart';
 
-// ingore_for_file: prefer_const_constructors
+// ingore_for_file: prefer_ _ ructors
 class Routes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final arguments = settings.arguments;
@@ -27,12 +31,12 @@ class Routes {
     switch (settings.name) {
       case RouteName.splashScreen:
         return MaterialPageRoute(
-          builder: (_) => const SplashScreen(),
+          builder: (_) => SplashScreen(),
         );
 
       case RouteName.introScreen:
         return MaterialPageRoute(
-          builder: (_) => const IntroScreen(),
+          builder: (_) => IntroScreen(),
         );
 
       case RouteName.signupScreen:
@@ -45,14 +49,9 @@ class Routes {
           builder: (_) => SigninScreen(),
         );
 
-      case RouteName.introScreen:
-        return MaterialPageRoute(
-          builder: (_) => const IntroScreen(),
-        );
-
       case RouteName.dashboard:
         return MaterialPageRoute(
-          builder: (_) => const Dashboard(),
+          builder: (_) => Dashboard(),
         );
 
       case RouteName.projectsScreen:
@@ -69,17 +68,17 @@ class Routes {
 
       case RouteName.inboxScreen:
         return MaterialPageRoute(
-          builder: (_) => const InboxScreen(),
+          builder: (_) => InboxScreen(),
         );
 
       case RouteName.moreScreen:
         return MaterialPageRoute(
-          builder: (_) => const MoreScreen(),
+          builder: (_) => MoreScreen(),
         );
 
       case RouteName.teamScreen:
         return MaterialPageRoute(
-          builder: (_) => const TeamScreen(),
+          builder: (_) => TeamScreen(),
         );
 
       case RouteName.profileScreen:
@@ -89,7 +88,7 @@ class Routes {
 
       case RouteName.numberInputScreen:
         return MaterialPageRoute(
-          builder: (_) => const NumberInputScreen(),
+          builder: (_) => NumberInputScreen(),
         );
 
       case RouteName.otpInputScreen:
@@ -99,12 +98,24 @@ class Routes {
 
       case RouteName.newPasswordScreen:
         return MaterialPageRoute(
-          builder: (_) => const NewPasswordScreen(),
+          builder: (_) => NewPasswordScreen(),
         );
 
       case RouteName.aiChatRoom:
         return MaterialPageRoute(
-          builder: (_) => const AiChatRoom(),
+          builder: (_) => AiChatRoom(),
+        );
+      case RouteName.addReviewScreen:
+        Map<String, dynamic> data = arguments as Map<String, dynamic>;
+        String projectId = data['projectId'];
+        return MaterialPageRoute(
+          builder: (_) => AddReviewScreen(
+            projectId: projectId,
+          ),
+        );
+      case RouteName.reviewsScreen:
+        return MaterialPageRoute(
+          builder: (_) => ReviewsScreen(),
         );
 
       case RouteName.projectDetailsScreen:

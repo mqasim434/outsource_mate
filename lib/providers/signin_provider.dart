@@ -110,6 +110,8 @@ class SigninProvider extends ChangeNotifier {
 
   Future<bool> signinWithEmployeeId(
       String employeeId, String password, BuildContext context) async {
+    print(employeeId);
+    print(password);
     try {
       EasyLoading.show(status: 'Logging in');
       CollectionReference employees =
@@ -134,8 +136,7 @@ class SigninProvider extends ChangeNotifier {
             await docSnapshot.reference
                 .update({'token': await notificationServices.getDeviceToken()});
           }
-          return true; 
-
+          return true;
         } else {
           EasyLoading.dismiss();
           ScaffoldMessenger.of(context).showSnackBar(

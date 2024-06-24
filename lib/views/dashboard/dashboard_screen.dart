@@ -1,7 +1,11 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:outsource_mate/models/notification_model.dart';
 import 'package:outsource_mate/models/project_model.dart';
 import 'package:outsource_mate/models/user_model.dart';
@@ -52,6 +56,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   DateTime? deadlineController;
+  final TextEditingController deadlineFieldController = TextEditingController();
   final freelancerController = TextEditingController();
   final moduleController = TextEditingController();
 
@@ -64,7 +69,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _loadProjects() async {
-    await projectsProvider.getProjects();
+    if (projectsProvider.projectsList.isEmpty) {
+      await projectsProvider.getProjects();
+    }
   }
 
   @override
@@ -126,14 +133,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.only(top: 20.0, left: 20, right: 20),
-                      child: Text(
-                        'Active Projects',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Active Projects',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          IconButton(
+                              onPressed: () {
+                                projectsProvider.projectsList.clear();
+                                setState(() {});
+                              },
+                              icon: Icon(Icons.replay_rounded))
+                        ],
                       ),
                     ),
                     const Divider(),
@@ -146,8 +164,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return const Center(
-                                child: CircularProgressIndicator());
+                            return const Center(child: SizedBox());
                           }
                           if (projectsProvider.projectsList.isEmpty) {
                             return const Center(child: Text("No Projects Yet"));
@@ -179,6 +196,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ? FloatingActionButton(
               backgroundColor: MyColors.pinkColor,
               onPressed: () {
+                final formKey = GlobalKey<FormState>();
                 showModalBottomSheet(
                   context: context,
                   barrierColor: Colors.black.withOpacity(0.5),
@@ -204,6 +222,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: Padding(
                         padding: const EdgeInsets.all(20),
                         child: Form(
+                          key: formKey,
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
@@ -230,6 +249,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 MyTextField(
                                   textFieldController: titleController,
                                   hintText: 'Enter Project Title',
+                                  validator: (value) {
+                                    if (value.toString().isEmpty) {
+                                      return "Project title can't be empty";
+                                    } else {
+                                      return null;
+                                    }
+                                  },
                                 ),
                                 const SizedBox(
                                   height: 10,
@@ -317,6 +343,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   height: 10,
                                 ),
                                 TextFormField(
+                                  controller: deadlineFieldController,
                                   readOnly: true,
                                   onTap: () async {
                                     final DateTime? pickedDate =
@@ -329,7 +356,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           DateTime(DateTime.now().year + 5),
                                     );
                                     if (pickedDate != null) {
-                                      // Combine picked date with current time
                                       final DateTime currentTime =
                                           DateTime.now();
                                       deadlineController = DateTime(
@@ -340,6 +366,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         currentTime.minute,
                                         currentTime.second,
                                       );
+
+                                      // Format the selected date and set it to the TextEditingController
+                                      final DateFormat formatter =
+                                          DateFormat('MM/dd/yyyy HH:mm:ss');
+                                      deadlineFieldController.text =
+                                          formatter.format(deadlineController!);
+
                                       setState(() {});
                                     }
                                   },
@@ -356,6 +389,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       right: 20,
                                     ),
                                   ),
+                                  validator: (value) {
+                                    if (value.toString().isEmpty) {
+                                      return "Deadline can't be empty";
+                                    } else {
+                                      return null;
+                                    }
+                                  },
                                 ),
                                 const SizedBox(
                                   height: 10,
@@ -364,6 +404,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   textFieldController: descriptionController,
                                   hintText: 'Enter Project Description',
                                   isDescription: true,
+                                  validator: (value) {
+                                    if (value.toString().isEmpty) {
+                                      return "Project description can't be empty";
+                                    } else {
+                                      return null;
+                                    }
+                                  },
                                 ),
                                 const SizedBox(
                                   height: 10,
@@ -392,6 +439,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       ),
                                     ),
                                   ),
+                                  validator: (value) {
+                                    if (projectsProvider.modules.isEmpty) {
+                                      return "Add one module at least";
+                                    } else {
+                                      return null;
+                                    }
+                                  },
                                 ),
                                 const SizedBox(
                                   height: 10,
@@ -454,10 +508,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       String url = await UtilityFunctions
                                           .uploadFileToFirebaseStorage(
                                               file.path);
-                                      projectsProvider.addFileUrl(url);
-                                    } else {
-                                      // User canceled the picker
-                                    }
+                                      projectsProvider.addFileUrl({
+                                        'fileName': file.path.split('/').last,
+                                        'fileUrl': url
+                                      });
+                                    } else {}
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
@@ -479,36 +534,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 RoundedRectangularButton(
                                   buttonText: 'Create',
                                   onPress: () {
-                                    print(freelancerController.text);
-                                    ProjectModel newProject = ProjectModel(
-                                        projectTitle: titleController.text,
-                                        projectDescription:
-                                            descriptionController.text,
-                                        deadline: deadlineController,
-                                        projectStatus: 'In Progress',
-                                        freelancerEmail:
-                                            freelancerEmail.toString(),
-                                        startingTime: DateTime.now(),
-                                        clientEmail:
-                                            UserModel.currentUser.email,
-                                        modules: projectsProvider.modules,
-                                        fileUrl: projectsProvider.fileUrl);
-                                    projectsProvider
-                                        .addProject(newProject, context)
-                                        .then((value) {
-                                      NotificationModel notificationModel =
-                                          NotificationModel(
-                                        title: 'New Project',
-                                        description:
-                                            'You created a new project',
-                                        userId: UserModel.currentUser.email,
-                                        time: DateTime.now(),
-                                        notificationType:
-                                            NotificationTypes.PROJECT.name,
-                                      );
-                                      notificationsProvider
-                                          .addNotification(notificationModel);
-                                    });
+                                    if (formKey.currentState!.validate()) {
+                                      print(freelancerController.text);
+                                      ProjectModel newProject = ProjectModel(
+                                          projectTitle: titleController.text,
+                                          projectDescription:
+                                              descriptionController.text,
+                                          deadline: deadlineController,
+                                          projectStatus: 'In Progress',
+                                          freelancerEmail:
+                                              freelancerEmail.toString(),
+                                          startingTime: DateTime.now(),
+                                          clientEmail:
+                                              UserModel.currentUser.email,
+                                          modules: projectsProvider.modules,
+                                          files: projectsProvider.files);
+                                      projectsProvider
+                                          .addProject(newProject, context)
+                                          .then((value) {
+                                        projectsProvider.modules.clear();
+                                        titleController.clear();
+                                        freelancerController.clear();
+                                        deadlineFieldController.clear();
+                                        projectsProvider.files.clear();
+                                        NotificationModel notificationModel =
+                                            NotificationModel(
+                                          title: 'New Project',
+                                          description:
+                                              'You created a new project',
+                                          userId: UserModel.currentUser.email,
+                                          time: DateTime.now(),
+                                          notificationType:
+                                              NotificationTypes.PROJECT.name,
+                                        );
+                                        notificationsProvider
+                                            .addNotification(notificationModel);
+                                      });
+                                    }
                                   },
                                 ),
                               ],

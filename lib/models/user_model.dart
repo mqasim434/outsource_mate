@@ -32,6 +32,7 @@ class EmployeeModel extends UserModel {
   String? empId;
   String? position;
   String? password;
+  List<String>? freelancersList;
 
   EmployeeModel({
     super.name,
@@ -47,6 +48,7 @@ class EmployeeModel extends UserModel {
     this.position,
     this.password,
     this.empId,
+    this.freelancersList,
   }) {
     empId = _generateEmployeeId();
     password = empId;
@@ -65,6 +67,12 @@ class EmployeeModel extends UserModel {
     isTyping = json['isTyping'];
     lastSeen = json['lastSeen'];
     deviceToken = json['deviceToken'];
+    if (json['freelancersList'] != null) {
+      freelancersList = [];
+      json['freelancersList'].forEach((value) {
+        freelancersList!.add(value);
+      });
+    }
     if (json['projects'] != null) {
       projects = [];
       json['projects'].forEach((v) {
@@ -86,6 +94,11 @@ class EmployeeModel extends UserModel {
     data['isTyping'] = isTyping;
     data['lastSeen'] = lastSeen;
     data['deviceToken'] = deviceToken;
+    if (freelancersList != null) {
+      {
+        data['freelancersList'] = freelancersList!.map((e) => e).toList();
+      }
+    }
     if (projects != null) {
       data['projects'] = projects!.map((v) => v.toJson()).toList();
     }
