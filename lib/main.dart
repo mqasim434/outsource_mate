@@ -17,12 +17,10 @@ import 'package:outsource_mate/providers/signup_provider.dart';
 import 'package:outsource_mate/providers/employee_provider.dart';
 import 'package:outsource_mate/providers/user_provider.dart';
 import 'package:outsource_mate/res/components/switch_button_widget.dart';
-import 'package:outsource_mate/services/notifications_services.dart';
 import 'package:outsource_mate/utils/consts.dart';
 import 'package:outsource_mate/utils/router.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firebase_options.dart';
 
 void main() async {

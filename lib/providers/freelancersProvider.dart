@@ -4,7 +4,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:outsource_mate/models/project_model.dart';
 import 'package:outsource_mate/models/user_model.dart';
 
-class FreelancersProvider extends ChangeNotifier{
+class FreelancersProvider extends ChangeNotifier {
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
   List<FreelancerModel> _freelancersList = [];
@@ -13,36 +13,42 @@ class FreelancersProvider extends ChangeNotifier{
 
   Future<void> fetchFreelancers() async {
     EasyLoading.show(status: 'Loading');
-    final QuerySnapshot result = await firebaseFirestore.collection('freelancers').get();
-    _freelancersList = result.docs.map((DocumentSnapshot doc) => FreelancerModel.fromJson(doc.data() as Map<String, dynamic>)).toList();
-    print(freelancersList[0].name);
+    final QuerySnapshot result =
+        await firebaseFirestore.collection('freelancers').get();
+    _freelancersList = result.docs
+        .map((DocumentSnapshot doc) =>
+            FreelancerModel.fromJson(doc.data() as Map<String, dynamic>))
+        .toList();
+    print(freelancersList[0].email);
     notifyListeners();
     EasyLoading.dismiss();
   }
 
-
-
-  Future<void> assignProjectToEmployee(String email, ProjectModel project) async {
-    Map<String,dynamic> projectData = project.toJson();
+  Future<void> assignProjectToEmployee(
+      String email, ProjectModel project) async {
     try {
-      QuerySnapshot querySnapshot = await firebaseFirestore.collection('employees').where('email', isEqualTo: email).get();
+      QuerySnapshot querySnapshot = await firebaseFirestore
+          .collection('projects')
+          .where('projectId', isEqualTo: project.projectId)
+          .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        DocumentSnapshot freelancerDoc = querySnapshot.docs.first;
-        List<dynamic> projects = freelancerDoc.get('projects') ?? [];
-        projects.add(projectData);
-        await freelancerDoc.reference.update({'projects': projects});
+        DocumentSnapshot doc = querySnapshot.docs.first;
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-        print('Project assigned to Employee successfully!');
+        ProjectModel project = ProjectModel.fromJson(data);
+        project.employeeEmail = email;
+        await firebaseFirestore
+            .collection('projects')
+            .doc(doc.id)
+            .update(project.toJson());
+        notifyListeners();
+        print('Project assigned to $email successfully.');
       } else {
-        print('No Employee found with the given email.');
+        print('Project with given projectId does not exist.');
       }
     } catch (e) {
       print('Error adding project: $e');
     }
   }
-
-
-
-
 }

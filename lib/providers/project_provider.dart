@@ -24,8 +24,18 @@ class ProjectProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void removeModule(int index) {
+    modules.removeAt(index);
+    notifyListeners();
+  }
+
   void addFileUrl(Map<String, String> file) {
     files.add(file);
+    notifyListeners();
+  }
+
+  void remoceFileUrl(Map<String, String> file) {
+    files.remove(file);
     notifyListeners();
   }
 
@@ -189,7 +199,7 @@ class ProjectProvider extends ChangeNotifier {
     return filteredProjects.length;
   }
 
-  int selectedProjectIndex = -1;
+  int? selectedProjectIndex;
 
   void updateIndex(int index) {
     selectedProjectIndex = index;

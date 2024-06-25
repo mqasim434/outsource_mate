@@ -23,34 +23,34 @@ class MyTextField extends StatelessWidget {
     return TextFormField(
       controller: textFieldController,
       obscureText: isPassword,
-      maxLines: isDescription?3:1,
+      maxLines: isDescription ? 3 : 1,
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
-            isDescription?10:50,
+            isDescription ? 10 : 50,
           ),
         ),
         hintText: hintText,
         suffixIcon: isPassword
-            ? ChangeNotifierProvider(create: (_)=>SignupProvider(),
-              child: Consumer<SignupProvider>(
-                builder: (context,provider,child){
-                  return InkWell(
-                    onTap: (){
-                      provider.togglePasswordVisibility(!provider.isVisible);
-                    },
-                    child: Icon(
-                      provider.isVisible?Icons.visibility:Icons.visibility_off
-                    ),
-                  );
-                },
-              ),
-            )
+            ? ChangeNotifierProvider(
+                create: (_) => SignupProvider(),
+                child: Consumer<SignupProvider>(
+                  builder: (context, provider, child) {
+                    return InkWell(
+                      onTap: () {
+                        provider.togglePasswordVisibility(!provider.isVisible);
+                      },
+                      child: Icon(provider.isVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off),
+                    );
+                  },
+                ),
+              )
             : null,
-        contentPadding: const EdgeInsets.only(
-          left: 20,
-          top: 15,
-          bottom: 15,
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 15,
+          horizontal: 15,
         ),
       ),
       validator: validator,

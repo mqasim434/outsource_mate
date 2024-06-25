@@ -11,6 +11,8 @@ class RouteName {
 
   static const String projectsScreen = 'projects';
 
+  static const String addProjectScreen = 'addProject';
+
   static const String chatScreen = 'chat';
 
   static const String inboxScreen = 'inbox';

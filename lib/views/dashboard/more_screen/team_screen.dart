@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:outsource_mate/models/project_model.dart';
 import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/employee_provider.dart';
 import 'package:outsource_mate/providers/freelancersProvider.dart';
@@ -310,29 +311,42 @@ class _TeamMemberWidgetState extends State<TeamMemberWidget> {
                             content: SizedBox(
                               width: screenWidth * 0.8,
                               height: 200,
-                              child: ListView.builder(
-                                  itemCount:
-                                      projectProvider.projectsList.length,
-                                  itemBuilder: (context, index) {
-                                    return Card(
-                                      child: ListTile(
-                                        title: Text(projectProvider
-                                            .projectsList[index].projectTitle
-                                            .toString()),
-                                        leading: Radio(
-                                          value: index,
-                                          groupValue: projectProvider
-                                              .selectedProjectIndex,
-                                          onChanged: (value) {
-                                            print(value);
-                                            projectProvider
-                                                .updateIndex(value as int);
-                                            setState(() {});
-                                          },
+                              child: Consumer<ProjectProvider>(
+                                builder: (context, provider, child) {
+                                  List<ProjectModel> filteredList = provider
+                                      .projectsList
+                                      .where((element) =>
+                                          element.employeeEmail !=
+                                          UserModel.currentUser.email)
+                                      .toList();
+                                  return ListView.builder(
+                                    itemCount: filteredList.length,
+                                    itemBuilder: (context, index) {
+                                      return Card(
+                                        child: ListTile(
+                                          title: Text(
+                                            filteredList[index]
+                                                .projectTitle
+                                                .toString(),
+                                          ),
+                                          leading: Radio(
+                                            value:
+                                                index, // Use index as the value for each Radio button
+                                            groupValue: provider
+                                                .selectedProjectIndex, // The currently selected index
+                                            onChanged: (value) {
+                                              print(value);
+                                              provider.updateIndex(value
+                                                  as int); // Update the selected index
+                                              setState(() {}); // Update the UI
+                                            },
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  }),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
                             ),
                             actions: [
                               RoundedRectangularButton(
@@ -344,7 +358,8 @@ class _TeamMemberWidgetState extends State<TeamMemberWidget> {
                                                 .toString(),
                                             projectProvider.projectsList[
                                                 projectProvider
-                                                    .selectedProjectIndex])
+                                                        .selectedProjectIndex
+                                                    as int])
                                         .then((value) {
                                       Navigator.pop(context);
                                     });

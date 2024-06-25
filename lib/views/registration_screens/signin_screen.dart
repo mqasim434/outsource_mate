@@ -12,6 +12,8 @@ class SigninScreen extends StatelessWidget {
   final empIdController = TextEditingController();
   final passwordController = TextEditingController();
 
+  final formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -91,6 +93,7 @@ class SigninScreen extends StatelessWidget {
                                   fontSize: 24, fontWeight: FontWeight.w500),
                             ),
                             Form(
+                              key: formKey,
                               child: Column(
                                 children: [
                                   (signinProvider.currentRoleSelected ==
@@ -110,6 +113,17 @@ class SigninScreen extends StatelessWidget {
                                                   BorderRadius.circular(50),
                                             ),
                                           ),
+                                          validator: (value) {
+                                            if (value.toString().isEmpty) {
+                                              return "Email can't be empty.";
+                                            } else if (!RegExp(
+                                                    r'^[^@]+@[^@]+\.[^@]+')
+                                                .hasMatch(value.toString())) {
+                                              return "Email is not valid";
+                                            } else {
+                                              return null;
+                                            }
+                                          },
                                         )
                                       : TextFormField(
                                           controller: empIdController,
@@ -124,6 +138,13 @@ class SigninScreen extends StatelessWidget {
                                                   BorderRadius.circular(50),
                                             ),
                                           ),
+                                          validator: (value) {
+                                            if (value!.isEmpty) {
+                                              return "Employee Id Can't be empty";
+                                            } else {
+                                              return null;
+                                            }
+                                          },
                                         ),
                                   const SizedBox(
                                     height: 10,
@@ -131,27 +152,36 @@ class SigninScreen extends StatelessWidget {
                                   TextFormField(
                                     controller: passwordController,
                                     decoration: InputDecoration(
-                                        hintText: 'Enter your password',
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 15, horizontal: 15),
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(50),
+                                      hintText: 'Enter your password',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 15, horizontal: 15),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(50),
+                                      ),
+                                      suffixIcon: InkWell(
+                                        onTap: () {
+                                          signinProvider
+                                              .togglePasswordVisibility(
+                                                  !signinProvider.isVisible);
+                                        },
+                                        child: Icon(
+                                          signinProvider.isVisible
+                                              ? Icons.remove_red_eye
+                                              : Icons.remove_red_eye_outlined,
                                         ),
-                                        suffixIcon: InkWell(
-                                          onTap: () {
-                                            signinProvider
-                                                .togglePasswordVisibility(
-                                                    !signinProvider.isVisible);
-                                          },
-                                          child: Icon(
-                                            signinProvider.isVisible
-                                                ? Icons.remove_red_eye
-                                                : Icons.remove_red_eye_outlined,
-                                          ),
-                                        )),
+                                      ),
+                                    ),
                                     obscureText: signinProvider.isVisible,
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return "Password Can't be empty";
+                                      } else if (value.length < 6) {
+                                        return "Invalid Password Length";
+                                      } else {
+                                        return null;
+                                      }
+                                    },
                                   ),
                                   const SizedBox(
                                     height: 5,
@@ -201,20 +231,30 @@ class SigninScreen extends StatelessWidget {
                                 ),
                               ),
                               onPressed: () {
-                                if (signinProvider.currentRoleSelected ==
-                                        UserRoles.FREELANCER ||
-                                    signinProvider.currentRoleSelected ==
-                                        UserRoles.CLIENT) {
-                                  signinProvider.signinWithEmail(
-                                      emailController.text,
-                                      passwordController.text,
-                                      context);
-                                } else {
-                                  signinProvider.signinWithEmployeeId(empIdController.text, passwordController.text,context).then((value){
-                                    if(value){
-                                      Navigator.pushNamed(context, RouteName.dashboard);
-                                    }
-                                  });
+                                if (formKey.currentState!.validate()) {
+                                  if (signinProvider.currentRoleSelected ==
+                                          UserRoles.FREELANCER ||
+                                      signinProvider.currentRoleSelected ==
+                                          UserRoles.CLIENT) {
+                                    signinProvider.signinWithEmail(
+                                        emailController.text,
+                                        passwordController.text,
+                                        context);
+                                  } else {
+                                    signinProvider
+                                        .signinWithEmployeeId(
+                                            empIdController.text,
+                                            passwordController.text,
+                                            context)
+                                        .then(
+                                      (value) {
+                                        if (value) {
+                                          Navigator.pushNamed(
+                                              context, RouteName.dashboard);
+                                        }
+                                      },
+                                    );
+                                  }
                                 }
                               },
                               child: const Text(

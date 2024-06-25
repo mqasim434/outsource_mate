@@ -13,6 +13,8 @@ class SignupScreen extends StatelessWidget {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
+  final formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -85,6 +87,7 @@ class SignupScreen extends StatelessWidget {
                                     fontSize: 24, fontWeight: FontWeight.w500),
                               ),
                               Form(
+                                key: formKey,
                                 child: Column(
                                   children: [
                                     signupProvider.currentRoleSelected ==
@@ -102,12 +105,22 @@ class SignupScreen extends StatelessWidget {
                                                     BorderRadius.circular(50),
                                               ),
                                             ),
+                                            validator: (value) {
+                                              if (value.toString().isEmpty) {
+                                                return "Email can't be empty.";
+                                              } else if (!RegExp(
+                                                      r'^[^@]+@[^@]+\.[^@]+')
+                                                  .hasMatch(value.toString())) {
+                                                return "Email is not valid";
+                                              } else {
+                                                return null;
+                                              }
+                                            },
                                           )
                                         : TextFormField(
                                             controller: emailController,
                                             decoration: InputDecoration(
-                                              hintText:
-                                                  'Enter your email',
+                                              hintText: 'Enter your email',
                                               contentPadding:
                                                   const EdgeInsets.symmetric(
                                                       vertical: 15,
@@ -117,6 +130,17 @@ class SignupScreen extends StatelessWidget {
                                                     BorderRadius.circular(50),
                                               ),
                                             ),
+                                            validator: (value) {
+                                              if (value.toString().isEmpty) {
+                                                return "Email can't be empty.";
+                                              } else if (!RegExp(
+                                                      r'^[^@]+@[^@]+\.[^@]+')
+                                                  .hasMatch(value.toString())) {
+                                                return "Email is not valid";
+                                              } else {
+                                                return null;
+                                              }
+                                            },
                                           ),
                                     const SizedBox(
                                       height: 10,
@@ -147,6 +171,15 @@ class SignupScreen extends StatelessWidget {
                                             ),
                                           )),
                                       obscureText: signupProvider.isVisible,
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return "Password Can't be empty";
+                                        } else if (value.length < 8) {
+                                          return "Invalid Password Length";
+                                        } else {
+                                          return null;
+                                        }
+                                      },
                                     ),
                                     const SizedBox(
                                       height: 10,
@@ -177,6 +210,18 @@ class SignupScreen extends StatelessWidget {
                                             ),
                                           )),
                                       obscureText: signupProvider.isVisible,
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return "Password Can't be empty";
+                                        } else if (value.length < 8) {
+                                          return "Invalid Password Length";
+                                        } else if (value !=
+                                            passwordController.text) {
+                                          return "Passwords dont't match";
+                                        } else {
+                                          return null;
+                                        }
+                                      },
                                     ),
                                     const SizedBox(
                                       height: 15,
@@ -213,10 +258,12 @@ class SignupScreen extends StatelessWidget {
                                   ),
                                 ),
                                 onPressed: () {
-                                  signupProvider.signupWithEmail(
-                                      emailController.text,
-                                      passwordController.text,
-                                      context);
+                                  if (formKey.currentState!.validate()) {
+                                    signupProvider.signupWithEmail(
+                                        emailController.text,
+                                        passwordController.text,
+                                        context);
+                                  }
                                 },
                                 child: const Text(
                                   'Sign up',

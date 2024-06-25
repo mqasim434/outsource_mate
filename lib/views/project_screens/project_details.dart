@@ -445,13 +445,16 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen>
                                       .updateProjectStatus(
                                           widget.project.projectId.toString(),
                                           'Completed')
-                                      .then((value) {
-                                    Navigator.pushNamed(
-                                        context, RouteName.addReviewScreen,
-                                        arguments: {
-                                          'projectId': widget.project.projectId,
-                                        });
-                                  });
+                                      .then(
+                                    (value) {
+                                      Navigator.pushNamed(
+                                          context, RouteName.addReviewScreen,
+                                          arguments: {
+                                            'projectId':
+                                                widget.project.projectId,
+                                          });
+                                    },
+                                  );
                                 },
                                 style: ElevatedButton.styleFrom(
                                     backgroundColor: MyColors.pinkColor),

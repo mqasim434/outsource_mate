@@ -8,6 +8,7 @@ class ProjectModel {
   DateTime? startingTime;
   DateTime? deadline;
   String? projectStatus;
+  bool? assigned;
   List<Map<String, bool>>? modules;
   List<Map<String, String>>? files;
   Map<String, dynamic>? review;
@@ -26,6 +27,7 @@ class ProjectModel {
       this.projectStatus,
       this.modules,
       this.files,
+      this.assigned = false,
       this.review}) {
     // Automatically assign projectId
     projectId = 'OM_P_${_counter++}';
@@ -42,6 +44,7 @@ class ProjectModel {
     deadline = DateTime.parse(json['deadline']);
     projectStatus = json['projectStatus'];
     review = json['review'];
+    assigned = json['assigned'];
     modules = json['modules'] != null
         ? List<Map<String, bool>>.from(
             json['modules'].map((x) => Map<String, bool>.from(x)))
@@ -66,6 +69,7 @@ class ProjectModel {
     data['modules'] = modules;
     data['files'] = files;
     data['review'] = review;
+    data['assigned'] = assigned;
     return data;
   }
 

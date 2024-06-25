@@ -13,6 +13,7 @@ import 'package:outsource_mate/views/dashboard/more_screen/team_screen.dart';
 import 'package:outsource_mate/views/dashboard/notifications_screen.dart';
 import 'package:outsource_mate/views/dashboard/projects_screen.dart';
 import 'package:outsource_mate/views/intro_screen/intro_screen.dart';
+import 'package:outsource_mate/views/project_screens/create_project_screen.dart';
 import 'package:outsource_mate/views/project_screens/project_details.dart';
 import 'package:outsource_mate/views/registration_screens/forgot_screens/new_password_screen.dart';
 import 'package:outsource_mate/views/registration_screens/forgot_screens/number_input_screen.dart';
@@ -57,6 +58,11 @@ class Routes {
       case RouteName.projectsScreen:
         return MaterialPageRoute(
           builder: (_) => ProjectsScreen(),
+        );
+
+      case RouteName.addProjectScreen:
+        return MaterialPageRoute(
+          builder: (_) => AddProjectScreen(),
         );
 
       case RouteName.chatScreen:

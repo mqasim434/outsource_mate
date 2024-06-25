@@ -61,7 +61,11 @@ class ProjectWidget extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    projectModel.employeeEmail.toString(),
+                    UserModel.currentUser.userType == 'CLIENT'
+                        ? projectModel.freelancerEmail.toString()
+                        : UserModel.currentUser.userType == 'FREELANCER'
+                            ? projectModel.employeeEmail.toString()
+                            : projectModel.freelancerEmail.toString(),
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
