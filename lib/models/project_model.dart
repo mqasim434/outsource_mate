@@ -2,6 +2,7 @@ class ProjectModel {
   String? projectId;
   String? projectTitle;
   String? projectDescription;
+  String? projectCost;
   String? employeeEmail;
   String? freelancerEmail;
   String? clientEmail;
@@ -19,6 +20,7 @@ class ProjectModel {
   ProjectModel(
       {this.projectTitle,
       this.projectDescription,
+      this.projectCost,
       this.employeeEmail,
       this.freelancerEmail,
       this.clientEmail,
@@ -37,6 +39,7 @@ class ProjectModel {
     projectTitle = json['projectTitle'];
     projectId = json['projectId'];
     projectDescription = json['projectDescription'];
+    projectCost = json['projectCost'];
     employeeEmail = json['employeeEmail'];
     freelancerEmail = json['freelancerEmail'];
     clientEmail = json['clientEmail'];
@@ -60,6 +63,7 @@ class ProjectModel {
     data['projectId'] = projectId;
     data['projectTitle'] = projectTitle;
     data['projectDescription'] = projectDescription;
+    data['projectCost'] = projectCost;
     data['employeeEmail'] = employeeEmail;
     data['freelancerEmail'] = freelancerEmail;
     data['clientEmail'] = clientEmail;
@@ -78,5 +82,14 @@ class ProjectModel {
       String key = modules![index].keys.first;
       modules![index][key] = newValue;
     }
+  }
+  double calculateProgress() {
+    if (modules == null || modules!.isEmpty) return 0.0;
+
+    int totalModules = modules!.length;
+    int completedModules = modules!.where((module) => module.values.first).length;
+
+    double progress = (completedModules / totalModules) * 100;
+    return progress;
   }
 }

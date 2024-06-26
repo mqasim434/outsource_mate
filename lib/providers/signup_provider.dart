@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/signin_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,7 +12,7 @@ class SignupProvider with ChangeNotifier {
   UserRoles currentRoleSelected = UserRoles.FREELANCER;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final NotificationServices notificationServices = NotificationServices();
+  // final NotificationServices notificationServices = NotificationServices();
 
   void changeRole(UserRoles role) {
     currentRoleSelected = role;
@@ -38,6 +39,7 @@ class SignupProvider with ChangeNotifier {
       saveUserInDatabase(userCredential).then((value) {
         print('Successfully signed up: ${userCredential.user!.uid}');
         EasyLoading.dismiss();
+        OneSignal.login(email);
         Navigator.pushNamed(context, RouteName.dashboard);
       });
     } catch (e) {
@@ -58,7 +60,7 @@ class SignupProvider with ChangeNotifier {
       final freelancer = FreelancerModel(
         email: userCredential.user!.email,
         userType: UserRoles.FREELANCER.name,
-        deviceToken: await notificationServices.getDeviceToken(),
+        // deviceToken: await notificationServices.getDeviceToken(),
       );
       UserModel.currentUser = freelancer;
       final jsonData = freelancer.toJson();
@@ -71,12 +73,13 @@ class SignupProvider with ChangeNotifier {
       final client = ClientModel(
         email: userCredential.user!.email,
         userType: UserRoles.CLIENT.name,
-        deviceToken: await notificationServices.getDeviceToken(),
+        // deviceToken: await notificationServices.getDeviceToken(),
       );
       UserModel.currentUser = client;
       final jsonData = client.toJson();
       _firestore.collection('clients').add(jsonData).then((value) {
         print('Client added with ID: ${value.id}');
+        
       }).catchError((e) {
         print('Error adding client: $e');
       });

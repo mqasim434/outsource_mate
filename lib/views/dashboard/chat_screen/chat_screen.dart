@@ -14,6 +14,7 @@ import 'package:outsource_mate/res/components/message_widget.dart';
 import 'package:outsource_mate/res/components/rounded_rectangular_button.dart';
 import 'package:outsource_mate/res/myColors.dart';
 import 'package:outsource_mate/services/notifications_services.dart';
+import 'package:outsource_mate/services/onesignal_service.dart';
 import 'package:outsource_mate/utils/utility_functions.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -22,7 +23,6 @@ class ChatScreen extends StatelessWidget {
   ChatScreen({super.key, this.otherUser});
 
   final dynamic otherUser;
-  final NotificationServices notificationServices = NotificationServices();
 
   @override
   Widget build(BuildContext context) {
@@ -132,35 +132,36 @@ class ChatScreen extends StatelessWidget {
                                         otherUser.email.toString()))
                             .toList();
                         return ListView.builder(
-                            reverse: true,
-                            itemCount: messages.length,
-                            physics: const BouncingScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              var message = messages[index];
-                              String time = message['timestamp'] != null
-                                  ? message['timestamp']
-                                      .toDate()
-                                      .toString()
-                                      .split(' ')[1]
-                                      .split('.')[0]
-                                  : '';
-                              String amPm = int.parse(time.split(':')[0]) >= 12
-                                  ? 'PM'
-                                  : 'AM';
-                              String hour = int.parse(time.split(':')[0]) >= 12
-                                  ? (int.parse(time.split(':')[0]) % 12)
-                                      .toString()
-                                  : time.split(':')[0];
-                              String minutes = time.split(':')[1];
-                              String seconds = time.split(':')[2];
-                              return MessageWidget(
-                                messageText: message['message'].toString(),
-                                time: '$hour:$minutes:$seconds $amPm',
-                                isSender: UserModel.currentUser.email ==
-                                    message['senderEmail'],
-                                isImage: message['isImage'],
-                              );
-                            });
+                          reverse: true,
+                          itemCount: messages.length,
+                          physics: const BouncingScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            var message = messages[index];
+                            String time = '';
+                            if (message['timestamp'] != null) {
+                              DateTime dateTime = message['timestamp'].toDate();
+                              int hour = dateTime.hour;
+                              String amPm = hour >= 12 ? 'PM' : 'AM';
+                              hour = hour % 12;
+                              hour = hour == 0
+                                  ? 12
+                                  : hour; // Convert hour 0 to 12 for 12-hour format
+                              String minutes =
+                                  dateTime.minute.toString().padLeft(2, '0');
+                              String seconds =
+                                  dateTime.second.toString().padLeft(2, '0');
+                              time = '$hour:$minutes:$seconds $amPm';
+                            }
+
+                            return MessageWidget(
+                              messageText: message['message'].toString(),
+                              time: time,
+                              isSender: UserModel.currentUser.email ==
+                                  message['senderEmail'],
+                              isImage: message['isImage'],
+                            );
+                          },
+                        );
                       }
                     },
                   ),
@@ -359,16 +360,11 @@ class ChatScreen extends StatelessWidget {
                               isDocument: false,
                             );
                             chatProvider.sendMessage(messageModel);
-                            NotificationServices notificationServices =
-                                NotificationServices();
-                            notificationServices
-                                .showNotification(
-                                  RemoteMessage(data: {
-                              'title':
-                                  'New Message from ${UserModel.currentUser.email}',
-                              'message': messageController.text,
-                              'token': otherUser.deviceToken,
-                            }));
+
+                            OneSignalService.sendNotification(
+                                [UserModel.currentUser.email.toString()],
+                                messageModel.messageText.toString(),
+                                'New Message from ${UserModel.currentUser.email}}');
                             messageController.clear();
                           }
                         },

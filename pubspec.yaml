@@ -60,6 +60,8 @@ dependencies:
   flutter_gemini: ^2.0.4
   dash_chat_2: ^0.0.21
   flutter_rating_stars: ^1.1.0
+  fl_chart: ^0.68.0
+  onesignal_flutter: ^5.2.1
 
 dev_dependencies:
   flutter_test:

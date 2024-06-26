@@ -23,8 +23,6 @@ class _DashboardState extends State<Dashboard> {
     // TODO: implement initState
     super.initState();
 
-    NotificationServices().requestNotificationPermissions();
-    NotificationServices().firebaseInit(context);
     
   }
   
