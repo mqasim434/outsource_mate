@@ -255,41 +255,14 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen>
                                                   ? TextDecoration.lineThrough
                                                   : TextDecoration.none),
                                     ),
-                                    trailing: UserModel.currentUser.userType ==
-                                            UserRoles.EMPLOYEE.name
-                                        ? Checkbox(
-                                            value: module.values.first,
-                                            onChanged: (value) {
-                                              projectProvider
-                                                  .updateModuleInFirebase(
-                                                      widget.project.projectId
-                                                          .toString(),
-                                                      index,
-                                                      value as bool);
-                                            },
-                                          )
+                                    trailing: (widget.project.projectStatus ==
+                                                'Completed' ||
+                                            widget.project.projectStatus ==
+                                                'Cancelled')
+                                        ? SizedBox()
                                         : UserModel.currentUser.userType ==
-                                                UserRoles.CLIENT.name
-                                            ? InkWell(
-                                                onTap: () {
-                                                  projectProvider
-                                                      .updateModuleInFirebase(
-                                                          widget
-                                                              .project.projectId
-                                                              .toString(),
-                                                          index,
-                                                          false)
-                                                      .then((value) {
-                                                    projectProvider
-                                                        .updateProjectStatus(
-                                                            widget.project
-                                                                .projectId
-                                                                .toString(),
-                                                            'In Revision');
-                                                  });
-                                                },
-                                                child: Icon(Icons.event_repeat))
-                                            : Checkbox(
+                                                UserRoles.EMPLOYEE.name
+                                            ? Checkbox(
                                                 value: module.values.first,
                                                 onChanged: (value) {
                                                   projectProvider
@@ -299,7 +272,41 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen>
                                                               .toString(),
                                                           index,
                                                           value as bool);
-                                                }),
+                                                },
+                                              )
+                                            : UserModel.currentUser.userType ==
+                                                    UserRoles.CLIENT.name
+                                                ? InkWell(
+                                                    onTap: () {
+                                                      projectProvider
+                                                          .updateModuleInFirebase(
+                                                              widget.project
+                                                                  .projectId
+                                                                  .toString(),
+                                                              index,
+                                                              false)
+                                                          .then((value) {
+                                                        projectProvider
+                                                            .updateProjectStatus(
+                                                                widget.project
+                                                                    .projectId
+                                                                    .toString(),
+                                                                'In Revision');
+                                                      });
+                                                    },
+                                                    child: Icon(
+                                                        Icons.event_repeat))
+                                                : Checkbox(
+                                                    value: module.values.first,
+                                                    onChanged: (value) {
+                                                      projectProvider
+                                                          .updateModuleInFirebase(
+                                                              widget.project
+                                                                  .projectId
+                                                                  .toString(),
+                                                              index,
+                                                              value as bool);
+                                                    }),
                                   );
                                 }),
                               ),
@@ -361,115 +368,144 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen>
                 ),
               ),
             ),
-            Container(
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.1),
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20))),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  const Text(
-                    'Project Progress',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(
-                    height: 16,
-                  ),
-                  Stack(
-                    children: [
-                      Column(
-                        children: [
-                          Container(
-                            height: 50 + 1,
-                            width: (screenWidth),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
-                              border: Border.all(color: Colors.black),
-                            ),
-                          ),
-                        ],
+            (widget.project.projectStatus == 'Completed' ||
+                    widget.project.projectStatus == 'Cancelled')
+                ? Container(
+                    width: screenWidth,
+                    height: 50,
+                    color: widget.project.projectStatus == 'Completed'
+                        ? Colors.green
+                        : Colors.red,
+                    child: Center(
+                        child: Text(
+                      widget.project.projectStatus.toString(),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(left: 1),
-                        width: getProgressWidth(screenWidth).toDouble(),
-                        height: 50,
-                        decoration: BoxDecoration(
-                          gradient: MyColors.pinkPurpleGradient,
-                          borderRadius: BorderRadius.circular(50),
-                          border: getProgressCount() == 100
-                              ? Border.all(color: Colors.black)
-                              : null,
+                    )),
+                  )
+                : Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.1),
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20))),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        const Text(
+                          'Project Progress',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                         ),
-                        child: Center(
-                          child: Text(
-                            '${getProgressCount().toString()}%',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        Stack(
+                          children: [
+                            Column(
+                              children: [
+                                Container(
+                                  height: 50 + 1,
+                                  width: (screenWidth),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(50),
+                                    border: Border.all(color: Colors.black),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  CustomTimerWidget(
-                    endDate: widget.project.deadline as DateTime,
-                  ),
-                  UserModel.currentUser.userType == 'CLIENT'
-                      ? Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  projectProvider.updateProjectStatus(
-                                      widget.project.projectId.toString(),
-                                      'Cancelled');
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: MyColors.purpleColor),
+                            Container(
+                              margin: const EdgeInsets.only(left: 1),
+                              width: getProgressWidth(screenWidth).toDouble(),
+                              height: 50,
+                              decoration: BoxDecoration(
+                                gradient: MyColors.pinkPurpleGradient,
+                                borderRadius: BorderRadius.circular(50),
+                                border: getProgressCount() == 100
+                                    ? Border.all(color: Colors.black)
+                                    : null,
+                              ),
+                              child: Center(
                                 child: Text(
-                                  'Cancel Project',
-                                  style: TextStyle(color: Colors.white),
+                                  '${getProgressCount().toString()}%',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  projectProvider
-                                      .updateProjectStatus(
-                                          widget.project.projectId.toString(),
-                                          'Completed')
-                                      .then(
-                                    (value) {
-                                      Navigator.pushNamed(
-                                          context, RouteName.addReviewScreen,
-                                          arguments: {
-                                            'projectId':
-                                                widget.project.projectId,
-                                          });
-                                    },
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: MyColors.pinkColor),
-                                child: Text(
-                                  'Complete Project',
-                                  style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
+                        CustomTimerWidget(
+                          endDate: widget.project.deadline as DateTime,
+                        ),
+                        UserModel.currentUser.userType == 'CLIENT'
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 10.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        projectProvider.updateProjectStatus(
+                                            widget.project.projectId.toString(),
+                                            'Cancelled');
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              MyColors.purpleColor),
+                                      child: Text(
+                                        'Cancel Project',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: getProgressCount() == 100
+                                          ? () {
+                                              projectProvider
+                                                  .updateProjectStatus(
+                                                      widget.project.projectId
+                                                          .toString(),
+                                                      'Completed')
+                                                  .then(
+                                                (value) {
+                                                  Navigator.pushNamed(context,
+                                                      RouteName.addReviewScreen,
+                                                      arguments: {
+                                                        'projectId': widget
+                                                            .project.projectId,
+                                                      });
+                                                },
+                                              );
+                                            }
+                                          : () {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(SnackBar(
+                                                      content: Text(
+                                                          'Project Progress is not 100%')));
+                                            },
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: MyColors.pinkColor),
+                                      child: Text(
+                                        'Complete Project',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : SizedBox(),
-                ],
-              ),
-            )
+                              )
+                            : SizedBox(),
+                      ],
+                    ),
+                  )
           ],
         ),
       ),

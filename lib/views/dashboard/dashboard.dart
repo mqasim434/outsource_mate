@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/bottom_navbar_provider.dart';
+import 'package:outsource_mate/providers/user_provider.dart';
 import 'package:outsource_mate/res/components/bottom_navbar.dart';
 import 'package:outsource_mate/services/notifications_services.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
@@ -16,16 +18,79 @@ class Dashboard extends StatefulWidget {
   State<Dashboard> createState() => _DashboardState();
 }
 
-class _DashboardState extends State<Dashboard> {
-  
+class _DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-
-    
+    WidgetsBinding.instance.addObserver(this);
   }
-  
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.inactive:
+        print("App is inactive");
+        Provider.of<UserProvider>(context, listen: false)
+            .updateUserField(fieldName: 'isOnline', newValue: 'false');
+        Provider.of<UserProvider>(context, listen: false).updateUserField(
+            fieldName: 'lastSeen',
+            newValue: DateTime.now().toString().split('.').first);
+        if (UserModel.currentUser.isTyping == true) {
+          Provider.of<UserProvider>(context, listen: false)
+              .updateUserField(fieldName: 'isTyping', newValue: 'false');
+        }
+        break;
+      case AppLifecycleState.paused:
+        print("App is paused");
+        Provider.of<UserProvider>(context, listen: false)
+            .updateUserField(fieldName: 'isOnline', newValue: 'false');
+        Provider.of<UserProvider>(context, listen: false).updateUserField(
+            fieldName: 'lastSeen',
+            newValue: DateTime.now().toString().split('.').first);
+        if (UserModel.currentUser.isTyping == true) {
+          Provider.of<UserProvider>(context, listen: false)
+              .updateUserField(fieldName: 'isTyping', newValue: 'false');
+        }
+
+        break;
+      case AppLifecycleState.resumed:
+        print("App is resumed");
+        Provider.of<UserProvider>(context, listen: false)
+            .updateUserField(fieldName: 'isOnline', newValue: true);
+        break;
+      case AppLifecycleState.detached:
+        print("App is detached");
+        Provider.of<UserProvider>(context, listen: false)
+            .updateUserField(fieldName: 'isOnline', newValue: false);
+        if (UserModel.currentUser.isTyping == true) {
+          Provider.of<UserProvider>(context, listen: false)
+              .updateUserField(fieldName: 'isTyping', newValue: false);
+        }
+        Provider.of<UserProvider>(context, listen: false).updateUserField(
+            fieldName: 'lastSeen',
+            newValue: DateTime.now().toString().split('.').first);
+      case AppLifecycleState.hidden:
+        print("App is Hidded");
+        Provider.of<UserProvider>(context, listen: false)
+            .updateUserField(fieldName: 'isOnline', newValue: false);
+        Provider.of<UserProvider>(context, listen: false).updateUserField(
+            fieldName: 'lastSeen',
+            newValue: DateTime.now().toString().split('.').first);
+        if (UserModel.currentUser.isTyping == true) {
+          Provider.of<UserProvider>(context, listen: false)
+              .updateUserField(fieldName: 'isTyping', newValue: false);
+        }
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottomNavbarProvider = Provider.of<BottomNavbarProvider>(context);

@@ -37,15 +37,15 @@ class _IntroScreenState extends State<IntroScreen> {
                   img: 'assets/vectors/task_assignment.jpg',
                 ),
                 IntroPage(
-                  title: 'Task Assignment',
+                  title: 'Employee Management',
                   text:
-                      'Simplify your workload by seamlessly assigning tasks to your team members, and gain real-time insights into their progress, ensuring every project stays on track',
+                      "Efficiently manage your team by monitoring their performance, providing feedback, and fostering a collaborative work environment. Ensure that each employee's strengths are utilized, contributing to the overall success of your projects.",
                   img: 'assets/vectors/revenue.jpg',
                 ),
                 IntroPage(
-                  title: 'Task Assignment',
+                  title: 'Time Management',
                   text:
-                      'Simplify your workload by seamlessly assigning tasks to your team members, and gain real-time insights into their progress, ensuring every project stays on track',
+                      'Optimize your productivity by effectively managing your time. Track deadlines, set priorities, and allocate resources wisely to ensure every project is completed on schedule, minimizing stress and maximizing output.',
                   img: 'assets/vectors/time_mgt.jpg',
                 ),
               ],

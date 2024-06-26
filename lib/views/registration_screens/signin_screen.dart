@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:outsource_mate/providers/signin_provider.dart';
 import 'package:outsource_mate/res/components/rotated_button.dart';
@@ -186,14 +188,20 @@ class SigninScreen extends StatelessWidget {
                                   const SizedBox(
                                     height: 5,
                                   ),
-                                  const Row(
+                                  Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      Text(
-                                        'Forgot Password',
-                                        style: TextStyle(
-                                            color: MyColors.purpleColor,
-                                            fontWeight: FontWeight.w500),
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.pushNamed(context,
+                                              RouteName.forgotPassword);
+                                        },
+                                        child: Text(
+                                          'Forgot Password',
+                                          style: TextStyle(
+                                              color: MyColors.purpleColor,
+                                              fontWeight: FontWeight.w500),
+                                        ),
                                       ),
                                     ],
                                   ),

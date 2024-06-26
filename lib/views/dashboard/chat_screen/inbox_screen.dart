@@ -35,9 +35,9 @@ class _InboxScreenState extends State<InboxScreen> {
   }
 
   Future<void> loadData() async {
-    freelancersProvider.fetchFreelancers();
-    clientsProvider.fetchClients();
-    employeeProvider.fetchEmployees();
+    await freelancersProvider.fetchFreelancers();
+    await clientsProvider.fetchClients();
+    await employeeProvider.fetchEmployees();
   }
 
   @override

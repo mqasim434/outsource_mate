@@ -7,9 +7,6 @@ class MyColors {
   static const Color lightBlackTextColor = Color(0xff323232);
   static const Color whiteTextColor = Colors.white;
 
-
-
-
   static LinearGradient purplePinkGradient = const LinearGradient(
     begin: Alignment.centerLeft, // Start from the left
     end: Alignment.centerRight, // End on the right

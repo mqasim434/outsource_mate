@@ -40,7 +40,7 @@ class SignupProvider with ChangeNotifier {
         print('Successfully signed up: ${userCredential.user!.uid}');
         EasyLoading.dismiss();
         OneSignal.login(email);
-        Navigator.pushNamed(context, RouteName.dashboard);
+        Navigator.pushNamed(context, RouteName.completeYourProfile);
       });
     } catch (e) {
       EasyLoading.dismiss();
@@ -79,7 +79,6 @@ class SignupProvider with ChangeNotifier {
       final jsonData = client.toJson();
       _firestore.collection('clients').add(jsonData).then((value) {
         print('Client added with ID: ${value.id}');
-        
       }).catchError((e) {
         print('Error adding client: $e');
       });

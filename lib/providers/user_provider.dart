@@ -25,6 +25,8 @@ class UserProvider extends ChangeNotifier {
         // Update the specified field in the document
         await userDoc.reference.update({
           fieldName: newValue,
+        }).then((value){
+          getUserDataByEmail(UserModel.currentUser.email, UtilityFunctions.getCollectionName(UserModel.currentUser.userType));
         });
 
         print('User field updated successfully.');
@@ -35,4 +37,29 @@ class UserProvider extends ChangeNotifier {
       print('Error updating user field: $e');
     }
   }
+
+  Future<UserModel?> getUserDataByEmail(String email, String collection) async {
+    final QuerySnapshot result = await FirebaseFirestore.instance
+        .collection(collection)
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get();
+
+    if (result.docs.isEmpty) {
+      return null;
+    }
+
+    final DocumentSnapshot document = result.docs.first;
+    final Map<String, dynamic> userData =
+        document.data() as Map<String, dynamic>;
+    if (collection == 'freelancers') {
+      return FreelancerModel.fromJson(userData);
+    } else if (collection == 'clients') {
+      return ClientModel.fromJson(userData);
+    } else {
+      return EmployeeModel.fromJson(userData);
+    }
+  }
 }
+
+

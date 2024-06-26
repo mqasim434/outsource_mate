@@ -50,7 +50,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
+              return SizedBox();
             } else if (snapshot.hasData) {
               var notifications = snapshot.data!.docs;
               return ListView.builder(

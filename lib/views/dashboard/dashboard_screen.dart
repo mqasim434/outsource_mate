@@ -104,8 +104,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                CircleAvatar(
-                  child: Icon(Icons.notifications_outlined),
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, RouteName.notifications);
+                  },
+                  child: CircleAvatar(
+                    child: Icon(Icons.notifications_outlined),
+                  ),
                 ),
               ],
             ),

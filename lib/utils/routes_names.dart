@@ -38,4 +38,11 @@ class RouteName {
   static const String addReviewScreen = 'addReview';
 
   static const String reviewsScreen = 'reviews';
+
+  static const String completeYourProfile = 'completeProfile';
+
+  static const String forgotPassword = 'forgot';
+
+  static const String addCard = 'addCard';
+
 }

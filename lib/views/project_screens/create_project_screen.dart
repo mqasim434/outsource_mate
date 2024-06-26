@@ -83,48 +83,7 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
     EasyLoading.dismiss();
   }
 
-  Map<String, dynamic>? paymentIntent = {};
-
-  Future<void> makePayment() async {
-    try {
-      paymentIntent = await createPaymentIntent(amountController.text, 'USD');
-      await Stripe.instance
-          .initPaymentSheet(
-              paymentSheetParameters: SetupPaymentSheetParameters(
-                  paymentIntentClientSecret: paymentIntent!['clientSecret'],
-                  merchantDisplayName: 'Outsource Mate'))
-          .then((value) {});
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  createPaymentIntent(String amount, String currency) async {
-    try {
-      Map<String, dynamic> body = {
-        'amount': calculateAmount(amount),
-        'currency': currency,
-        'payment_method_types[]': 'card',
-      };
-
-      var response = await http.post(
-        Uri.parse('https://api.stripe.com/v1/payment_intents'),
-        headers: {
-          'Authorization': 'Bearer $STRIPER_SECRET_KEY',
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: body,
-      );
-      return jsonDecode(response.body);
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  calculateAmount(String amount) {
-    final calculatedAmount = (int.parse(amount)) * 100;
-    return calculatedAmount.toString();
-  }
+  Map<String, dynamic>? paymentIntentData;
 
   @override
   Widget build(BuildContext context) {
@@ -359,7 +318,6 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                     InkWell(
                       onTap: () async {
                         final result = await FilePicker.platform.pickFiles();
-
                         if (result != null) {
                           File file = File(result.files.single.path!);
                           String url = await UtilityFunctions
@@ -427,68 +385,74 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                       buttonText: 'Create',
                       onPress: () {
                         if (formKey.currentState!.validate()) {
-                          EasyLoading.show(status: 'Adding Project');
-                          print(freelancerController.text);
-                          ProjectModel newProject = ProjectModel(
-                              projectTitle: titleController.text,
-                              projectDescription: descriptionController.text,
-                              deadline: deadlineController,
-                              projectStatus: 'In Progress',
-                              freelancerEmail: freelancerEmail.toString(),
-                              startingTime: DateTime.now(),
-                              clientEmail: UserModel.currentUser.email,
-                              modules: projectsProvider.modules,
-                              files: projectsProvider.files);
-                          projectsProvider
-                              .addProject(newProject, context)
-                              .then((value) {
-                            projectsProvider.modules.clear();
-                            titleController.clear();
-                            freelancerController.clear();
-                            deadlineFieldController.clear();
-                            projectsProvider.files.clear();
-                            descriptionController.clear();
-                            NotificationModel notificationModel =
-                                NotificationModel(
-                              title: 'New Project',
-                              description: 'You created a new project',
-                              userId: UserModel.currentUser.email,
-                              time: DateTime.now(),
-                              notificationType: NotificationTypes.PROJECT.name,
-                            );
-                            NotificationModel freelancerNotification =
-                                NotificationModel(
-                              title: 'New Project',
-                              description:
-                                  '${UserModel.currentUser.email} created a new project',
-                              userId: freelancerController.text,
-                              time: DateTime.now(),
-                              notificationType: NotificationTypes.PROJECT.name,
-                            );
-                            notificationsProvider
-                                .addNotification(notificationModel);
-                            notificationsProvider
-                                .addNotification(freelancerNotification);
-                            EasyLoading.dismiss();
-                          }).then((value) {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: Text('Project Created Successfully'),
-                                    actions: [
-                                      ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  MyColors.pinkColor),
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text('Ok'))
-                                    ],
-                                  );
-                                });
+                          makePayment().then((value) {
+                            EasyLoading.show(status: 'Adding Project');
+                            print(freelancerController.text);
+                            ProjectModel newProject = ProjectModel(
+                                projectTitle: titleController.text,
+                                projectDescription: descriptionController.text,
+                                deadline: deadlineController,
+                                projectStatus: 'In Progress',
+                                freelancerEmail: freelancerEmail.toString(),
+                                startingTime: DateTime.now(),
+                                clientEmail: UserModel.currentUser.email,
+                                modules: projectsProvider.modules,
+                                files: projectsProvider.files);
+
+                            projectsProvider
+                                .addProject(newProject, context)
+                                .then((value) {
+                              // Navigator.pushNamed(context, RouteName.addCard);
+                              projectsProvider.modules.clear();
+                              titleController.clear();
+                              freelancerController.clear();
+                              deadlineFieldController.clear();
+                              projectsProvider.files.clear();
+                              descriptionController.clear();
+                              NotificationModel notificationModel =
+                                  NotificationModel(
+                                title: 'New Project',
+                                description: 'You created a new project',
+                                userId: UserModel.currentUser.email,
+                                time: DateTime.now(),
+                                notificationType:
+                                    NotificationTypes.PROJECT.name,
+                              );
+                              NotificationModel freelancerNotification =
+                                  NotificationModel(
+                                title: 'New Project',
+                                description:
+                                    '${UserModel.currentUser.email} created a new project',
+                                userId: freelancerController.text,
+                                time: DateTime.now(),
+                                notificationType:
+                                    NotificationTypes.PROJECT.name,
+                              );
+                              notificationsProvider
+                                  .addNotification(notificationModel);
+                              notificationsProvider
+                                  .addNotification(freelancerNotification);
+                              EasyLoading.dismiss();
+                            }).then((value) {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title:
+                                          Text('Project Created Successfully'),
+                                      actions: [
+                                        ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    MyColors.pinkColor),
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text('Ok'))
+                                      ],
+                                    );
+                                  });
+                            });
                           });
                         }
                       },
@@ -501,5 +465,95 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> makePayment() async {
+    try {
+      paymentIntentData = await createPaymentIntent(
+          amountController.text, 'USD'); //json.decode(response.body);
+      // print('Response body==>${response.body.toString()}');
+      await Stripe.instance
+          .initPaymentSheet(
+              paymentSheetParameters: SetupPaymentSheetParameters(
+                  setupIntentClientSecret: 'Your Secret Key',
+                  paymentIntentClientSecret:
+                      paymentIntentData!['client_secret'],
+                  //applePay: PaymentSheetApplePay.,
+                  //googlePay: true,
+                  //testEnv: true,
+                  customFlow: true,
+                  style: ThemeMode.dark,
+                  // merchantCountryCode: 'US',
+                  merchantDisplayName: 'Outsource Mate'))
+          .then((value) {});
+
+      ///now finally display payment sheeet
+      displayPaymentSheet();
+    } catch (e, s) {
+      print('Payment exception:$e$s');
+    }
+  }
+
+  displayPaymentSheet() async {
+    try {
+      await Stripe.instance
+          .presentPaymentSheet(
+              //       parameters: PresentPaymentSheetParameters(
+              // clientSecret: paymentIntentData!['client_secret'],
+              // confirmPayment: true,
+              // )
+              )
+          .then((newValue) {
+        print('payment intent' + paymentIntentData!['id'].toString());
+        print(
+            'payment intent' + paymentIntentData!['client_secret'].toString());
+        print('payment intent' + paymentIntentData!['amount'].toString());
+        print('payment intent' + paymentIntentData.toString());
+        //orderPlaceApi(paymentIntentData!['id'].toString());
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("paid successfully")));
+
+        paymentIntentData = null;
+      }).onError((error, stackTrace) {
+        print('Exception/DISPLAYPAYMENTSHEET==> $error $stackTrace');
+      });
+    } on StripeException catch (e) {
+      print('Exception/DISPLAYPAYMENTSHEET==> $e');
+      showDialog(
+          context: context,
+          builder: (_) => const AlertDialog(
+                content: Text("Cancelled "),
+              ));
+    } catch (e) {
+      print('$e');
+    }
+  }
+
+  //  Future<Map<String, dynamic>>
+  createPaymentIntent(String amount, String currency) async {
+    try {
+      Map<String, dynamic> body = {
+        'amount': calculateAmount('20'),
+        'currency': currency,
+        'payment_method_types[]': 'card',
+      };
+      print(body);
+      var response = await http.post(
+          Uri.parse('https://api.stripe.com/v1/payment_intents'),
+          body: body,
+          headers: {
+            'Authorization': 'Bearer $STRIPER_SECRET_KEY',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          });
+      print('Create Intent reponse ===> ${response.body.toString()}');
+      return jsonDecode(response.body);
+    } catch (err) {
+      print('err charging user: ${err.toString()}');
+    }
+  }
+
+  calculateAmount(String amount) {
+    final a = (int.parse(amount)) * 100;
+    return a.toString();
   }
 }

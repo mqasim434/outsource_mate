@@ -22,6 +22,7 @@ import 'package:outsource_mate/utils/consts.dart';
 import 'package:outsource_mate/utils/router.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:outsource_mate/views/intro_screen/intro_screen.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
@@ -29,8 +30,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-OneSignal.initialize(ONESIGNAL_APP_ID);
-OneSignal.Notifications.requestPermission(true);
+  OneSignal.initialize(ONESIGNAL_APP_ID);
+  OneSignal.Notifications.requestPermission(true);
   Gemini.init(apiKey: GEMINI_API_KEY);
   Stripe.publishableKey = STRIPER_PUBLISH_KEY;
   // await dotenv.load(fileName: ".env");
@@ -69,6 +70,7 @@ class MyApp extends StatelessWidget {
         ),
         builder: EasyLoading.init(),
         initialRoute: RouteName.splashScreen,
+        // home: IntroScreen(),
         onGenerateRoute: Routes.generateRoute,
       ),
     );

@@ -174,7 +174,7 @@ class SignupScreen extends StatelessWidget {
                                       validator: (value) {
                                         if (value!.isEmpty) {
                                           return "Password Can't be empty";
-                                        } else if (value.length < 8) {
+                                        } else if (value.length < 6) {
                                           return "Invalid Password Length";
                                         } else {
                                           return null;
@@ -213,7 +213,7 @@ class SignupScreen extends StatelessWidget {
                                       validator: (value) {
                                         if (value!.isEmpty) {
                                           return "Password Can't be empty";
-                                        } else if (value.length < 8) {
+                                        } else if (value.length < 6) {
                                           return "Invalid Password Length";
                                         } else if (value !=
                                             passwordController.text) {

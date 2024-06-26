@@ -13,8 +13,11 @@ import 'package:outsource_mate/views/dashboard/more_screen/team_screen.dart';
 import 'package:outsource_mate/views/dashboard/notifications_screen.dart';
 import 'package:outsource_mate/views/dashboard/projects_screen.dart';
 import 'package:outsource_mate/views/intro_screen/intro_screen.dart';
+import 'package:outsource_mate/views/payment/add_new_card.dart';
 import 'package:outsource_mate/views/project_screens/create_project_screen.dart';
 import 'package:outsource_mate/views/project_screens/project_details.dart';
+import 'package:outsource_mate/views/registration_screens/complete_your_profile.dart';
+import 'package:outsource_mate/views/registration_screens/forgot_screens/forgot_password.dart';
 import 'package:outsource_mate/views/registration_screens/forgot_screens/new_password_screen.dart';
 import 'package:outsource_mate/views/registration_screens/forgot_screens/number_input_screen.dart';
 import 'package:outsource_mate/views/registration_screens/forgot_screens/otp_input_screen.dart';
@@ -65,6 +68,11 @@ class Routes {
           builder: (_) => AddProjectScreen(),
         );
 
+      case RouteName.completeYourProfile:
+        return MaterialPageRoute(
+          builder: (_) => CompleteYourProfileScreen(),
+        );
+
       case RouteName.chatScreen:
         Map<String, dynamic> data = arguments as Map<String, dynamic>;
         dynamic otherUser = data['otherUser'];
@@ -92,6 +100,11 @@ class Routes {
           builder: (_) => ProfileScreen(),
         );
 
+      case RouteName.forgotPassword:
+        return MaterialPageRoute(
+          builder: (_) => ForgotPassword(),
+        );
+
       case RouteName.numberInputScreen:
         return MaterialPageRoute(
           builder: (_) => NumberInputScreen(),
@@ -100,6 +113,10 @@ class Routes {
       case RouteName.otpInputScreen:
         return MaterialPageRoute(
           builder: (_) => OtpInputScreen(),
+        );
+      case RouteName.addCard:
+        return MaterialPageRoute(
+          builder: (_) => AddNewCard(),
         );
 
       case RouteName.newPasswordScreen:
