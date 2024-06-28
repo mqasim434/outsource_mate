@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -22,7 +23,6 @@ import 'package:outsource_mate/utils/consts.dart';
 import 'package:outsource_mate/utils/router.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'package:outsource_mate/views/intro_screen/intro_screen.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
@@ -34,6 +34,12 @@ void main() async {
   OneSignal.Notifications.requestPermission(true);
   Gemini.init(apiKey: GEMINI_API_KEY);
   Stripe.publishableKey = STRIPER_PUBLISH_KEY;
+  await FlutterDownloader.initialize(
+      debug:
+          true, // optional: set to false to disable printing logs to console (default: true)
+      ignoreSsl:
+          true // option: set to false to disable working with http links (default: false)
+      );
   // await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }

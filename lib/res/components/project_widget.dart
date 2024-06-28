@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:outsource_mate/models/project_model.dart';
 import 'package:outsource_mate/models/user_model.dart';
@@ -10,16 +12,16 @@ class ProjectWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     return InkWell(
       onTap: () {
         Navigator.pushNamed(context, RouteName.projectDetailsScreen,
             arguments: {'project': projectModel});
       },
       child: Container(
-        width: width,
-        height: height * 0.25,
+        width: screenWidth,
+        height: screenHeight * 0.25,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(
@@ -51,10 +53,10 @@ class ProjectWidget extends StatelessWidget {
                 children: [
                   Text(
                     UserModel.currentUser.userType == 'CLIENT'
-                        ? 'Freelancer Email: '
+                        ? 'Freelancer: '
                         : UserModel.currentUser.userType == 'FREELANCER'
-                            ? 'Employee Email'
-                            : 'Freelancer Name',
+                            ? 'Employee:'
+                            : 'Freelancer:',
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -62,10 +64,10 @@ class ProjectWidget extends StatelessWidget {
                   ),
                   Text(
                     UserModel.currentUser.userType == 'CLIENT'
-                        ? projectModel.freelancerEmail.toString()
+                        ? projectModel.freelancerName.toString()
                         : UserModel.currentUser.userType == 'FREELANCER'
-                            ? projectModel.employeeEmail.toString()
-                            : projectModel.freelancerEmail.toString(),
+                            ? projectModel.employeeName.toString()
+                            : projectModel.freelancerName.toString(),
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -84,7 +86,7 @@ class ProjectWidget extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    projectModel.startingTime.toString(),
+                    projectModel.startingTime.toString().split('.').first,
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -103,7 +105,7 @@ class ProjectWidget extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    projectModel.deadline.toString(),
+                    projectModel.deadline.toString().split('.').first,
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -112,18 +114,18 @@ class ProjectWidget extends StatelessWidget {
                 ],
               ),
               const Divider(),
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Time Remaining: ',
+                    'Cost: ',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    '11:26:25',
+                    '${projectModel.projectCost.toString()}\$',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,

@@ -92,109 +92,111 @@ class TeamScreen extends StatelessWidget {
                       topRight: Radius.circular(25.0),
                     ),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              InkWell(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Icon(Icons.cancel)),
-                            ],
-                          ),
-                          const Text(
-                            'Add New Employee',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
+                  child: Form(
+                    key: formKey,
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                InkWell(
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Icon(Icons.cancel)),
+                              ],
                             ),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          MyTextField(
-                            textFieldController: nameController,
-                            hintText: 'Enter Employee Name',
-                            validator: (value) {
-                              if (value.toString().isEmpty) {
-                                return "Employee name can't be empty";
-                              } else {
-                                return null;
-                              }
-                            },
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          MyTextField(
-                            textFieldController: emailController,
-                            hintText: 'Enter Email',
-                            validator: (value) {
-                              if (value.toString().isEmpty) {
-                                return "Email can't be empty";
-                              } else {
-                                return null;
-                              }
-                            },
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          MyTextField(
-                            textFieldController: phoneController,
-                            hintText: 'Enter Phone',
-                            validator: (value) {
-                              if (value.toString().isEmpty) {
-                                return "Phone can't be empty";
-                              } else {
-                                return null;
-                              }
-                            },
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          MyTextField(
-                            textFieldController: roleController,
-                            hintText: 'Enter Employee Role',
-                            validator: (value) {
-                              if (value.toString().isEmpty) {
-                                return "Role can't be empty";
-                              } else {
-                                return null;
-                              }
-                            },
-                          ),
-                          const SizedBox(
-                            height: 40,
-                          ),
-                          RoundedRectangularButton(
-                            buttonText: 'Add Employee',
-                            onPress: () {
-                              EmployeeModel newEmployee = EmployeeModel(
-                                name: nameController.text,
-                                email: emailController.text,
-                                phone: phoneController.text,
-                                position: roleController.text,
-                              );
-                              employeeProvider.createEmployee(
-                                  newEmployee, context);
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return const AlertDialog(
-                                      title: Text('New Employee Added'),
-                                    );
-                                  });
-                            },
-                          ),
-                        ],
+                            const Text(
+                              'Add New Employee',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            MyTextField(
+                              textFieldController: nameController,
+                              hintText: 'Enter Employee Name',
+                              validator: (value) {
+                                if (value.toString().isEmpty) {
+                                  return "Employee name can't be empty";
+                                } else {
+                                  return null;
+                                }
+                              },
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            MyTextField(
+                              textFieldController: emailController,
+                              hintText: 'Enter Email',
+                              validator: (value) {
+                                if (value.toString().isEmpty) {
+                                  return "Email can't be empty";
+                                } else {
+                                  return null;
+                                }
+                              },
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            MyTextField(
+                              textFieldController: phoneController,
+                              hintText: 'Enter Phone',
+                              validator: (value) {
+                                if (value.toString().isEmpty) {
+                                  return "Phone can't be empty";
+                                } else {
+                                  return null;
+                                }
+                              },
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            MyTextField(
+                              textFieldController: roleController,
+                              hintText: 'Enter Employee Role',
+                              validator: (value) {
+                                if (value.toString().isEmpty) {
+                                  return "Role can't be empty";
+                                } else {
+                                  return null;
+                                }
+                              },
+                            ),
+                            const SizedBox(
+                              height: 40,
+                            ),
+                            RoundedRectangularButton(
+                              buttonText: 'Add Employee',
+                              onPress: () {
+                                EmployeeModel newEmployee = EmployeeModel(
+                                  name: nameController.text,
+                                  email: emailController.text,
+                                  phone: phoneController.text,
+                                  position: roleController.text,
+                                );
+                                employeeProvider.createEmployee(
+                                    newEmployee, context);
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return const AlertDialog(
+                                        title: Text('New Employee Added'),
+                                      );
+                                    });
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

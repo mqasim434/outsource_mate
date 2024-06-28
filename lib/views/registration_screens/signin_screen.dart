@@ -39,6 +39,7 @@ class SigninScreen extends StatelessWidget {
                           label: UserRoles.FREELANCER,
                           onTap: () {
                             signinProvider.changeRole(UserRoles.FREELANCER);
+                            emailController.clear();
                           },
                           page: 'signin',
                         ),
@@ -49,6 +50,7 @@ class SigninScreen extends StatelessWidget {
                           label: UserRoles.EMPLOYEE,
                           onTap: () {
                             signinProvider.changeRole(UserRoles.EMPLOYEE);
+                            passwordController.clear();
                           },
                           page: 'signin',
                         ),

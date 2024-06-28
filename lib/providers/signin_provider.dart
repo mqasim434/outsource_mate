@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:outsource_mate/models/user_model.dart';
-import 'package:outsource_mate/services/encrpyion_services.dart';
-import 'package:outsource_mate/services/notifications_services.dart';
-import 'package:outsource_mate/utils/login_session_manager.dart';
+import 'package:outsource_mate/services/session_manager.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 import 'package:outsource_mate/utils/utility_functions.dart';
 
@@ -55,7 +53,10 @@ class SigninProvider extends ChangeNotifier {
           if (currentRoleSelected == UserRoles.FREELANCER) {
             UserModel.currentUser =
                 await getUserDataByEmail(email, 'freelancers');
-            LoginSessionManager.storeUserSession(email, 'freelancers')
+            SessionManager.createSession(
+                    email: email,
+                    password: password,
+                    userRole: UserRoles.FREELANCER.name)
                 .then((value) async {
               // final querySnapshot = await FirebaseFirestore.instance
               //     .collection('freelancers')
@@ -72,7 +73,10 @@ class SigninProvider extends ChangeNotifier {
             });
           } else if (currentRoleSelected == UserRoles.CLIENT) {
             UserModel.currentUser = await getUserDataByEmail(email, 'clients');
-            LoginSessionManager.storeUserSession(email, 'clients')
+            SessionManager.createSession(
+                    email: email,
+                    password: password,
+                    userRole: UserRoles.CLIENT.name)
                 .then((value) async {
               // final querySnapshot = await FirebaseFirestore.instance
               //     .collection('clients')
@@ -130,6 +134,11 @@ class SigninProvider extends ChangeNotifier {
           UserModel.currentUser =
               UtilityFunctions.convertDocumentToUserModel(employeeDoc);
           EasyLoading.dismiss();
+          SessionManager.createSession(
+            email: employeeId,
+            password: password,
+            userRole: UserRoles.CLIENT.name,
+          );
           // final querySnapshot = await FirebaseFirestore.instance
           //     .collection('employees')
           //     .where('empId', isEqualTo: employeeId)

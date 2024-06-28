@@ -95,13 +95,13 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             Expanded(
               child: ListView.builder(
                 itemCount: projectsProvider.projectsList
-                    .where((element) =>
-                        element.projectStatus == filterProvider.selectedLabel)
+                    .where((project) =>
+                        project.projectStatus == filterProvider.selectedLabel)
                     .length,
                 itemBuilder: (context, index) {
                   final filteredProjects = projectsProvider.projectsList
-                      .where((element) =>
-                          element.projectStatus == filterProvider.selectedLabel)
+                      .where((project) =>
+                          project.projectStatus == filterProvider.selectedLabel)
                       .toList();
                   if (filteredProjects.isNotEmpty) {
                     final project = filteredProjects[index];

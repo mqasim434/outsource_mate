@@ -38,25 +38,25 @@ class _DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
         print("App is inactive");
         Provider.of<UserProvider>(context, listen: false)
-            .updateUserField(fieldName: 'isOnline', newValue: 'false');
+            .updateUserField(fieldName: 'isOnline', newValue: false);
         Provider.of<UserProvider>(context, listen: false).updateUserField(
             fieldName: 'lastSeen',
             newValue: DateTime.now().toString().split('.').first);
         if (UserModel.currentUser.isTyping == true) {
           Provider.of<UserProvider>(context, listen: false)
-              .updateUserField(fieldName: 'isTyping', newValue: 'false');
+              .updateUserField(fieldName: 'isTyping', newValue: false);
         }
         break;
       case AppLifecycleState.paused:
         print("App is paused");
         Provider.of<UserProvider>(context, listen: false)
-            .updateUserField(fieldName: 'isOnline', newValue: 'false');
+            .updateUserField(fieldName: 'isOnline', newValue: false);
         Provider.of<UserProvider>(context, listen: false).updateUserField(
             fieldName: 'lastSeen',
             newValue: DateTime.now().toString().split('.').first);
         if (UserModel.currentUser.isTyping == true) {
           Provider.of<UserProvider>(context, listen: false)
-              .updateUserField(fieldName: 'isTyping', newValue: 'false');
+              .updateUserField(fieldName: 'isTyping', newValue: false);
         }
 
         break;

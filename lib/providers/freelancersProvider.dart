@@ -20,8 +20,8 @@ class FreelancersProvider extends ChangeNotifier {
             FreelancerModel.fromJson(doc.data() as Map<String, dynamic>))
         .toList();
     print(freelancersList[0].email);
-    notifyListeners();
     EasyLoading.dismiss();
+    notifyListeners();
   }
 
   Future<void> assignProjectToEmployee(

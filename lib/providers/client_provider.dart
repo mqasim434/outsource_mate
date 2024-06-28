@@ -17,8 +17,9 @@ class ClientProvider extends ChangeNotifier{
     final QuerySnapshot result = await FirebaseFirestore.instance.collection('clients').get();
     _clientsList = result.docs.map((DocumentSnapshot doc) => ClientModel.fromJson(doc.data() as Map<String, dynamic>)).toList();
     print(_clientsList[0].name);
-    notifyListeners();
     EasyLoading.dismiss();
+    notifyListeners();
+    
   }
 
   Future<void> addProjectToFreelancerByEmail(String email, ProjectModel project) async {
@@ -43,4 +44,38 @@ class ClientProvider extends ChangeNotifier{
       print('Error adding project: $e');
     }
   }
+
+  Future<void> addEmailToFreelancersList(String newEmailToAdd) async {
+  try {
+    // Reference to the 'clients' collection in Firestore
+    final clientsRef = FirebaseFirestore.instance.collection('clients');
+
+    // Query to find the client document based on email
+    QuerySnapshot querySnapshot = await clientsRef.where('email', isEqualTo: UserModel.currentUser.email).get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      // Assuming there's only one client document per unique email (or handling if multiple found)
+      DocumentSnapshot clientSnapshot = querySnapshot.docs.first;
+
+      // Retrieve the current freelancers list from the document
+      List<String> currentFreelancers = List<String>.from(clientSnapshot['freelancers']);
+
+      // Add the new email to the freelancers list if it's not already present
+      if (!currentFreelancers.contains(newEmailToAdd)) {
+        currentFreelancers.add(newEmailToAdd);
+
+        // Update the document in Firestore with the updated freelancers list
+        await clientsRef.doc(clientSnapshot.id).update({'freelancers': currentFreelancers});
+        
+        print('Email added to freelancers list successfully.');
+      } else {
+        print('Email $newEmailToAdd already exists in the freelancers list.');
+      }
+    } else {
+      print('Client document not found for email: ${UserModel.currentUser.email}');
+    }
+  } catch (e) {
+    print('Error adding email to freelancers list: $e');
+  }
+}
 }

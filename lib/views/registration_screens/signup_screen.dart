@@ -3,6 +3,7 @@ import 'package:outsource_mate/providers/signin_provider.dart';
 import 'package:outsource_mate/providers/signup_provider.dart';
 import 'package:outsource_mate/res/components/rotated_button.dart';
 import 'package:outsource_mate/res/myColors.dart';
+import 'package:outsource_mate/services/email_service.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 import 'package:outsource_mate/views/registration_screens/signin_screen.dart';
 import 'package:provider/provider.dart';
@@ -41,6 +42,9 @@ class SignupScreen extends StatelessWidget {
                             label: UserRoles.FREELANCER,
                             onTap: () {
                               signupProvider.changeRole(UserRoles.FREELANCER);
+                              emailController.clear();
+                              passwordController.clear();
+                              confirmPasswordController.clear();
                             },
                             page: 'signup',
                           ),
@@ -51,6 +55,9 @@ class SignupScreen extends StatelessWidget {
                             label: UserRoles.CLIENT,
                             onTap: () {
                               signupProvider.changeRole(UserRoles.CLIENT);
+                              emailController.clear();
+                              passwordController.clear();
+                              confirmPasswordController.clear();
                             },
                             page: 'signup',
                           ),
@@ -259,10 +266,15 @@ class SignupScreen extends StatelessWidget {
                                 ),
                                 onPressed: () {
                                   if (formKey.currentState!.validate()) {
-                                    signupProvider.signupWithEmail(
-                                        emailController.text,
-                                        passwordController.text,
-                                        context);
+                                    signupProvider
+                                        .signupWithEmail(emailController.text,
+                                            passwordController.text, context)
+                                        .then((value) {
+                                      // EmailService.sendSignupEmail(
+                                      //   emailController.text,
+                                      //   emailController.text,
+                                      // ).then((value) => null);
+                                    });
                                   }
                                 },
                                 child: const Text(

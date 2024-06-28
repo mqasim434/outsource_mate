@@ -1,12 +1,10 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/client_provider.dart';
 import 'package:outsource_mate/providers/employee_provider.dart';
 import 'package:outsource_mate/providers/freelancersProvider.dart';
+import 'package:outsource_mate/providers/signin_provider.dart';
 import 'package:outsource_mate/res/myColors.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 import 'package:provider/provider.dart';
@@ -35,9 +33,14 @@ class _InboxScreenState extends State<InboxScreen> {
   }
 
   Future<void> loadData() async {
-    await freelancersProvider.fetchFreelancers();
-    await clientsProvider.fetchClients();
-    await employeeProvider.fetchEmployees();
+    if (UserModel.currentUser.userType == UserRoles.CLIENT.name) {
+      await freelancersProvider.fetchFreelancers();
+    } else if (UserModel.currentUser.userType == UserRoles.EMPLOYEE.name) {
+      await freelancersProvider.fetchFreelancers();
+    } else {
+      await clientsProvider.fetchClients();
+      await employeeProvider.fetchEmployees();
+    }
   }
 
   @override
@@ -186,79 +189,77 @@ class _InboxScreenState extends State<InboxScreen> {
                               child: Text('No Freelancers Found'),
                             )
                           : Expanded(
-                              child: Column(
-                                children: [
-                                  InkWell(
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                          context, RouteName.aiChatRoom);
-                                    },
-                                    child: Card(
-                                      color: MyColors.purpleColor,
-                                      child: ListTile(
-                                        title: Text(
-                                          'MateBot Assist',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        leading: CircleAvatar(
-                                          backgroundImage:
-                                              AssetImage('assets/logo/bot.jpg'),
-                                        ),
-                                        trailing: Icon(
-                                          Icons.arrow_forward_ios,
-                                          color: Colors.white,
-                                        ),
+                              child: Column(children: [
+                              InkWell(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, RouteName.aiChatRoom);
+                                },
+                                child: Card(
+                                  color: MyColors.purpleColor,
+                                  child: ListTile(
+                                    title: Text(
+                                      'MateBot Assist',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
                                       ),
                                     ),
-                                  ),
-                                  Expanded(
-                                    child: ListView.builder(
-                                      itemCount: freelancersProvider
-                                          .freelancersList.length,
-                                      itemBuilder: (context, index) {
-                                        final FreelancerModel freelancer =
-                                            freelancersProvider
-                                                .freelancersList[index];
-                                        return Card(
-                                          child: ListTile(
-                                            onTap: () {
-                                              Navigator.pushNamed(
-                                                  context, RouteName.chatScreen,
-                                                  arguments: {
-                                                    'otherUser': freelancer,
-                                                  });
-                                            },
-                                            leading: const CircleAvatar(
-                                              child: Icon(Icons.person),
-                                            ),
-                                            title: freelancer.name != null
-                                                ? Text(
-                                                    freelancer.name.toString(),
-                                                    style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  )
-                                                : Text(
-                                                    freelancer.email.toString(),
-                                                    style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                            subtitle: const Text('Hello!'),
-                                            trailing: const Text('8:46 PM'),
-                                          ),
-                                        );
-                                      },
+                                    leading: CircleAvatar(
+                                      backgroundImage:
+                                          AssetImage('assets/logo/bot.jpg'),
+                                    ),
+                                    trailing: Icon(
+                                      Icons.arrow_forward_ios,
+                                      color: Colors.white,
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
-                            )
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: freelancersProvider
+                                      .freelancersList.length,
+                                  itemBuilder: (context, index) {
+                                    final FreelancerModel freelancer =
+                                        freelancersProvider
+                                            .freelancersList[index];
+
+                                    // Check if the freelancer's email is in UserMode.currentUser.freelancersList
+                                    if (UserModel.currentUser.freelancersList !=
+                                            null &&
+                                        UserModel.currentUser.freelancersList!
+                                            .contains(freelancer.email)) {
+                                      return Card(
+                                        child: ListTile(
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                                context, RouteName.chatScreen,
+                                                arguments: {
+                                                  'otherUser': freelancer,
+                                                });
+                                          },
+                                          leading: const CircleAvatar(
+                                            child: Icon(Icons.person),
+                                          ),
+                                          title: Text(
+                                            freelancer.name.toString(),
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          subtitle: const Text('Hello!'),
+                                          trailing: const Text('8:46 PM'),
+                                        ),
+                                      );
+                                    } else {
+                                      // Return an empty container if the freelancer's email is not in the list
+                                      return Container();
+                                    }
+                                  },
+                                ),
+                              )
+                            ]))
                       : UserModel.currentUser.userType == 'EMPLOYEE'
                           ? Expanded(
                               child: Column(

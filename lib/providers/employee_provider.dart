@@ -18,8 +18,8 @@ class EmployeeProvider extends ChangeNotifier {
             EmployeeModel.fromJson(doc.data() as Map<String, dynamic>))
         .toList();
     print(employeeList[0].name);
-    notifyListeners();
     EasyLoading.dismiss();
+    notifyListeners();
   }
 
   Future<void> createEmployee(
@@ -45,4 +45,8 @@ class EmployeeProvider extends ChangeNotifier {
       print('Error adding employee: $e');
     }
   }
+
+  
+
+
 }

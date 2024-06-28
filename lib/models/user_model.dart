@@ -112,18 +112,21 @@ class EmployeeModel extends UserModel {
 }
 
 class FreelancerModel extends UserModel {
-  FreelancerModel({
-    super.name,
-    super.email,
-    super.phone,
-    super.imageUrl,
-    super.userType,
-    super.isOnline,
-    super.isTyping,
-    super.lastSeen,
-    super.projects = const [],
-    super.deviceToken,
-  });
+  List<String>? clientsList;
+  List<String>? employeesList;
+  FreelancerModel(
+      {super.name,
+      super.email,
+      super.phone,
+      super.imageUrl,
+      super.userType,
+      super.isOnline,
+      super.isTyping,
+      super.lastSeen,
+      super.projects = const [],
+      super.deviceToken,
+      this.clientsList,
+      this.employeesList});
 
   FreelancerModel.fromJson(Map<String, dynamic> json) {
     name = json['name'];
@@ -139,6 +142,18 @@ class FreelancerModel extends UserModel {
       projects = [];
       json['projects'].forEach((v) {
         projects!.add(ProjectModel.fromJson(v));
+      });
+    }
+    if (json['clientsList'] != null) {
+      clientsList = [];
+      json['freelancersList'].forEach((value) {
+        clientsList!.add(value);
+      });
+    }
+    if (json['employeesList'] != null) {
+      employeesList = [];
+      json['freelancersList'].forEach((value) {
+        employeesList!.add(value);
       });
     }
   }
@@ -157,11 +172,22 @@ class FreelancerModel extends UserModel {
     if (projects != null) {
       data['projects'] = projects!.map((v) => v.toJson()).toList();
     }
+    if (clientsList != null) {
+      {
+        data['clientsList'] = clientsList!.map((e) => e).toList();
+      }
+    }
+    if (employeesList != null) {
+      {
+        data['employeesList'] = employeesList!.map((e) => e).toList();
+      }
+    }
     return data;
   }
 }
 
 class ClientModel extends UserModel {
+  List<String>? freelancersList;
   ClientModel({
     super.name,
     super.email,
@@ -173,6 +199,7 @@ class ClientModel extends UserModel {
     super.lastSeen,
     super.projects = const [],
     super.deviceToken,
+    this.freelancersList,
   });
 
   ClientModel.fromJson(Map<String, dynamic> json) {
@@ -191,6 +218,12 @@ class ClientModel extends UserModel {
         projects!.add(ProjectModel.fromJson(v));
       });
     }
+    if (json['freelancersList'] != null) {
+      freelancersList = [];
+      json['freelancersList'].forEach((value) {
+        freelancersList!.add(value);
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -206,6 +239,11 @@ class ClientModel extends UserModel {
     data['deviceToken'] = deviceToken;
     if (projects != null) {
       data['projects'] = projects!.map((v) => v.toJson()).toList();
+    }
+    if (freelancersList != null) {
+      {
+        data['freelancersList'] = freelancersList!.map((e) => e).toList();
+      }
     }
     return data;
   }

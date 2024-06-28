@@ -36,7 +36,7 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
   ClientProvider clientProvider = ClientProvider();
   NotificationsProvider notificationsProvider = NotificationsProvider();
 
-  String? selectedFreelancerId;
+  String? selectedFreelancerName;
   String? freelancerEmail;
 
   final titleController = TextEditingController();
@@ -46,6 +46,7 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
   final TextEditingController deadlineFieldController = TextEditingController();
   final freelancerController = TextEditingController();
   final moduleController = TextEditingController();
+
   final formKey = GlobalKey<FormState>();
 
   List<FreelancerModel> freelancersList = [];
@@ -53,7 +54,6 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
   @override
   void initState() {
     // TODO: implement initState
-
     projectProvider = Provider.of<ProjectProvider>(context, listen: false);
     clientProvider = Provider.of<ClientProvider>(context, listen: false);
     notificationsProvider =
@@ -131,19 +131,39 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                       height: 10,
                     ),
                     DropdownButtonFormField(
-                      items: freelancersList
-                          .map((e) => DropdownMenuItem(
-                                value: e.email.toString(),
-                                child: Text(
-                                  e.email.toString(),
-                                ),
-                              ))
-                          .toList(),
+                      items: freelancersList.map((freelancer) {
+                        return DropdownMenuItem(
+                          value: freelancer,
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 20,
+                                backgroundImage: freelancer.imageUrl != null
+                                    ? NetworkImage(
+                                        freelancer.imageUrl.toString())
+                                    : null,
+                                child: freelancer.imageUrl == null
+                                    ? Icon(Icons.person)
+                                    : null,
+                              ),
+                              SizedBox(
+                                width: 12,
+                              ),
+                              Text(
+                                freelancer.name.toString(),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
                       hint: Text('Select a Freelancer'),
                       onChanged: (value) {
-                        selectedFreelancerId = value.toString();
-                        freelancerController.text = value.toString();
-                        setState(() {});
+                        setState(() {
+                          if (value != null) {
+                            freelancerEmail = value.email.toString();
+                            selectedFreelancerName = value.name.toString();
+                          }
+                        });
                       },
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -393,15 +413,18 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                                 projectDescription: descriptionController.text,
                                 deadline: deadlineController,
                                 projectStatus: 'In Progress',
-                                freelancerEmail: freelancerEmail.toString(),
+                                freelancerEmail: freelancerEmail,
+                                freelancerName:
+                                    selectedFreelancerName.toString(),
                                 startingTime: DateTime.now(),
                                 clientEmail: UserModel.currentUser.email,
+                                projectCost: amountController.text,
                                 modules: projectsProvider.modules,
                                 files: projectsProvider.files);
 
                             projectsProvider
                                 .addProject(newProject, context)
-                                .then((value) {
+                                .then((value) async {
                               // Navigator.pushNamed(context, RouteName.addCard);
                               projectsProvider.modules.clear();
                               titleController.clear();
@@ -409,49 +432,54 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                               deadlineFieldController.clear();
                               projectsProvider.files.clear();
                               descriptionController.clear();
-                              NotificationModel notificationModel =
-                                  NotificationModel(
-                                title: 'New Project',
-                                description: 'You created a new project',
-                                userId: UserModel.currentUser.email,
-                                time: DateTime.now(),
-                                notificationType:
-                                    NotificationTypes.PROJECT.name,
-                              );
-                              NotificationModel freelancerNotification =
-                                  NotificationModel(
-                                title: 'New Project',
-                                description:
-                                    '${UserModel.currentUser.email} created a new project',
-                                userId: freelancerController.text,
-                                time: DateTime.now(),
-                                notificationType:
-                                    NotificationTypes.PROJECT.name,
-                              );
-                              notificationsProvider
-                                  .addNotification(notificationModel);
-                              notificationsProvider
-                                  .addNotification(freelancerNotification);
-                              EasyLoading.dismiss();
-                            }).then((value) {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title:
-                                          Text('Project Created Successfully'),
-                                      actions: [
-                                        ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    MyColors.pinkColor),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: Text('Ok'))
-                                      ],
-                                    );
-                                  });
+                              clientProvider
+                                  .addEmailToFreelancersList(
+                                      freelancerEmail.toString())
+                                  .then((value) {
+                                NotificationModel notificationModel =
+                                    NotificationModel(
+                                  title: 'New Project',
+                                  description: 'You created a new project',
+                                  userId: UserModel.currentUser.email,
+                                  time: DateTime.now(),
+                                  notificationType:
+                                      NotificationTypes.PROJECT.name,
+                                );
+                                NotificationModel freelancerNotification =
+                                    NotificationModel(
+                                  title: 'New Project',
+                                  description:
+                                      '${UserModel.currentUser.email} created a new project',
+                                  userId: freelancerController.text,
+                                  time: DateTime.now(),
+                                  notificationType:
+                                      NotificationTypes.PROJECT.name,
+                                );
+                                notificationsProvider
+                                    .addNotification(notificationModel);
+                                notificationsProvider
+                                    .addNotification(freelancerNotification);
+                                EasyLoading.dismiss();
+                              }).then((value) {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text(
+                                            'Project Created Successfully'),
+                                        actions: [
+                                          ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      MyColors.pinkColor),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text('Ok'))
+                                        ],
+                                      );
+                                    });
+                              });
                             });
                           });
                         }

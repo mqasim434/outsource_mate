@@ -17,8 +17,13 @@ class MyNavBar extends StatelessWidget {
       height: MediaQuery.of(context).size.height * 0.08,
       decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.only(topRight: Radius.circular(20),topLeft: Radius.circular(20))
-      ),
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(20),
+            topLeft: Radius.circular(20),
+          ),
+          boxShadow: [
+            BoxShadow(color: Colors.black26, blurRadius: 20),
+          ]),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: navItems,
@@ -55,7 +60,7 @@ class NavItem extends StatelessWidget {
         children: [
           Icon(
             isSelected ? activeIcon : inActiveIcon,
-            color: isSelected ? MyColors.purpleColor: Colors.grey,
+            color: isSelected ? MyColors.purpleColor : Colors.grey,
           ),
           Text(
             label.toString(),

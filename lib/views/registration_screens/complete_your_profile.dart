@@ -2,9 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/user_provider.dart';
 import 'package:outsource_mate/res/components/my_text_field.dart';
 import 'package:outsource_mate/res/myColors.dart';
+import 'package:outsource_mate/services/email_service.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 import 'package:provider/provider.dart';
 
@@ -89,6 +91,11 @@ class CompleteYourProfileScreen extends StatelessWidget {
                         ),
                         onPressed: () {
                           if (formKey.currentState!.validate()) {
+                            // EmailService.sendEmail(
+                            //   "You've successfully signed up to Outsource Mate",
+                            //   "Signup alert from Outsource Mate",
+                            //   UserModel.currentUser.email,
+                            // ).then((value) => null);
                             EasyLoading.show(status: 'Updating');
                             Provider.of<UserProvider>(context, listen: false)
                                 .updateUserField(
@@ -101,7 +108,7 @@ class CompleteYourProfileScreen extends StatelessWidget {
                                       newValue: phoneController.text)
                                   .then((value) {
                                 Navigator.pushNamed(
-                                    context, RouteName.dashboard);
+                                    context, RouteName.introScreen);
                               });
                             });
                           }

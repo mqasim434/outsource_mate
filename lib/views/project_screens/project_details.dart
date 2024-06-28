@@ -12,7 +12,9 @@ import 'package:outsource_mate/providers/project_provider.dart';
 import 'package:outsource_mate/providers/signin_provider.dart';
 import 'package:outsource_mate/res/myColors.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 
 class ProjectDetailsScreen extends StatefulWidget {
   const ProjectDetailsScreen({super.key, required this.project});
@@ -320,7 +322,8 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen>
                                 title: Text('Files'),
                               );
                             },
-                            body: widget.project.files != null
+                            body: (widget.project.files != null ||
+                                    widget.project.files!.isNotEmpty)
                                 ? SizedBox(
                                     height: 200,
                                     child: ListView.builder(
@@ -333,7 +336,24 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen>
                                                   .files![index]['fileName']
                                                   .toString(),
                                             ),
-                                            trailing: Icon(Icons.download),
+                                            trailing: InkWell(
+                                                onTap: () async {
+                                                  final directory =
+                                                      await getDownloadsDirectory();
+                                                  final taskId =
+                                                      await FlutterDownloader
+                                                          .enqueue(
+                                                    url:
+                                                        '${widget.project.files![index]['fileUrl']}',
+                                                    savedDir:
+                                                        '${directory!.path}/${widget.project.files![index]['fileName']}',
+                                                    showNotification:
+                                                        true, // show download progress in status bar (for Android)
+                                                    openFileFromNotification:
+                                                        true, // click on notification to open downloaded file (for Android)
+                                                  );
+                                                },
+                                                child: Icon(Icons.download)),
                                           );
                                         }),
                                   )

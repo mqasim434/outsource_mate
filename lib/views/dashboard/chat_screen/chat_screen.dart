@@ -1,10 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:outsource_mate/models/message_model.dart';
 import 'package:outsource_mate/models/user_model.dart';
@@ -13,11 +9,9 @@ import 'package:outsource_mate/providers/user_provider.dart';
 import 'package:outsource_mate/res/components/message_widget.dart';
 import 'package:outsource_mate/res/components/rounded_rectangular_button.dart';
 import 'package:outsource_mate/res/myColors.dart';
-import 'package:outsource_mate/services/notifications_services.dart';
 import 'package:outsource_mate/services/onesignal_service.dart';
 import 'package:outsource_mate/utils/utility_functions.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 
 class ChatScreen extends StatelessWidget {
   ChatScreen({super.key, this.otherUser});
@@ -70,10 +64,21 @@ class ChatScreen extends StatelessWidget {
                         bool isTyping =
                             snapshot.data!.docs.first.data()['isTyping'] ??
                                 false;
+                        bool isOnline =
+                            snapshot.data!.docs.first.data()['isOnline'] ??
+                                false;
+                        String lastSeen =
+                            snapshot.data!.docs.first.data()['lastSeen'] ?? '';
                         return Text(
-                          isTyping ? 'typing...' : '',
-                          style: const TextStyle(
-                            color: Colors.black,
+                          isTyping == true
+                              ? 'typing...'
+                              : isOnline == true
+                                  ? 'online'
+                                  : 'last seen: ${lastSeen.split(' ')[1]}',
+                          style: TextStyle(
+                            color: (isOnline == true || isTyping == true)
+                                ? Colors.green
+                                : Colors.black,
                             fontSize: 12,
                           ),
                         );
