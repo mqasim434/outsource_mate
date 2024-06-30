@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/client_provider.dart';
@@ -231,26 +232,122 @@ class _InboxScreenState extends State<InboxScreen> {
                                         UserModel.currentUser.freelancersList!
                                             .contains(freelancer.email)) {
                                       return Card(
-                                        child: ListTile(
-                                          onTap: () {
-                                            Navigator.pushNamed(
-                                                context, RouteName.chatScreen,
-                                                arguments: {
-                                                  'otherUser': freelancer,
-                                                });
-                                          },
-                                          leading: const CircleAvatar(
-                                            child: Icon(Icons.person),
-                                          ),
-                                          title: Text(
-                                            freelancer.name.toString(),
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          subtitle: const Text('Hello!'),
-                                          trailing: const Text('8:46 PM'),
-                                        ),
+                                        child: StreamBuilder(
+                                            stream: FirebaseFirestore.instance
+                                                .collection('freelancers')
+                                                .where('email',
+                                                    isEqualTo: freelancer.email)
+                                                .limit(1)
+                                                .snapshots(),
+                                            builder: (context, snapshot) {
+                                              return ListTile(
+                                                onTap: () {
+                                                  Navigator.pushNamed(context,
+                                                      RouteName.chatScreen,
+                                                      arguments: {
+                                                        'otherUser': freelancer,
+                                                      });
+                                                },
+                                                leading: snapshot.data !=
+                                                            null &&
+                                                        snapshot.data!.docs
+                                                                    .first
+                                                                    .data()[
+                                                                'imageUrl'] !=
+                                                            null
+                                                    ? Stack(
+                                                        alignment:
+                                                            Alignment.topRight,
+                                                        children: [
+                                                          CircleAvatar(
+                                                            backgroundImage:
+                                                                NetworkImage(snapshot
+                                                                        .data!
+                                                                        .docs
+                                                                        .first
+                                                                        .data()['imageUrl'] ??
+                                                                    ''),
+                                                          ),
+                                                          Container(
+                                                            width: 10,
+                                                            height: 10,
+                                                            decoration: BoxDecoration(
+                                                                color: (snapshot.data !=
+                                                                            null &&
+                                                                        snapshot.data!.docs.first.data()['isOnline'] ==
+                                                                            true)
+                                                                    ? Colors
+                                                                        .green
+                                                                    : Colors
+                                                                        .grey,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20)),
+                                                          ),
+                                                        ],
+                                                      )
+                                                    : Stack(
+                                                        children: [
+                                                          CircleAvatar(
+                                                            child: Icon(
+                                                                Icons.person),
+                                                          ),
+                                                          Container(
+                                                              width: 10,
+                                                              height: 10,
+                                                              decoration: BoxDecoration(
+                                                                  color: (snapshot.data !=
+                                                                              null &&
+                                                                          snapshot.data!.docs.first.data()['isOnline'] ==
+                                                                              true)
+                                                                      ? Colors
+                                                                          .green
+                                                                      : Colors
+                                                                          .grey,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              20))),
+                                                        ],
+                                                      ),
+                                                title: Text(
+                                                  freelancer.name.toString(),
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                subtitle: snapshot
+                                                            .connectionState ==
+                                                        ConnectionState.waiting
+                                                    ? Text('')
+                                                    : Text(
+                                                        ((snapshot.data !=
+                                                                    null) &&
+                                                                (snapshot
+                                                                        .data!
+                                                                        .docs
+                                                                        .first
+                                                                        .data()['isTyping'] ==
+                                                                    true))
+                                                            ? 'typing...'
+                                                            : 'Last Seen ${snapshot.data!.docs.first.data()['lastSeen'].toString().split(' ')[1]}',
+                                                        style: TextStyle(
+                                                            color: ((snapshot
+                                                                            .data !=
+                                                                        null) &&
+                                                                    (snapshot
+                                                                            .data!
+                                                                            .docs
+                                                                            .first
+                                                                            .data()['isTyping'] ==
+                                                                        true))
+                                                                ? Colors.green
+                                                                : Colors.black),
+                                                      ),
+                                                // trailing: const Text('8:46 PM'),
+                                              );
+                                            }),
                                       );
                                     } else {
                                       // Return an empty container if the freelancer's email is not in the list

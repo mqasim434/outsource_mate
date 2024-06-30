@@ -436,30 +436,35 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                                   .addEmailToFreelancersList(
                                       freelancerEmail.toString())
                                   .then((value) {
-                                NotificationModel notificationModel =
-                                    NotificationModel(
-                                  title: 'New Project',
-                                  description: 'You created a new project',
-                                  userId: UserModel.currentUser.email,
-                                  time: DateTime.now(),
-                                  notificationType:
-                                      NotificationTypes.PROJECT.name,
-                                );
-                                NotificationModel freelancerNotification =
-                                    NotificationModel(
-                                  title: 'New Project',
-                                  description:
-                                      '${UserModel.currentUser.email} created a new project',
-                                  userId: freelancerController.text,
-                                  time: DateTime.now(),
-                                  notificationType:
-                                      NotificationTypes.PROJECT.name,
-                                );
-                                notificationsProvider
-                                    .addNotification(notificationModel);
-                                notificationsProvider
-                                    .addNotification(freelancerNotification);
-                                EasyLoading.dismiss();
+                                clientProvider
+                                    .addEmailToClientsList(
+                                        UserModel.currentUser.email)
+                                    .then((value) {
+                                  NotificationModel notificationModel =
+                                      NotificationModel(
+                                    title: 'New Project',
+                                    description: 'You created a new project',
+                                    userId: UserModel.currentUser.email,
+                                    time: DateTime.now(),
+                                    notificationType:
+                                        NotificationTypes.PROJECT.name,
+                                  );
+                                  NotificationModel freelancerNotification =
+                                      NotificationModel(
+                                    title: 'New Project',
+                                    description:
+                                        '${UserModel.currentUser.email} created a new project',
+                                    userId: freelancerController.text,
+                                    time: DateTime.now(),
+                                    notificationType:
+                                        NotificationTypes.PROJECT.name,
+                                  );
+                                  notificationsProvider
+                                      .addNotification(notificationModel);
+                                  notificationsProvider
+                                      .addNotification(freelancerNotification);
+                                  EasyLoading.dismiss();
+                                });
                               }).then((value) {
                                 showDialog(
                                     context: context,

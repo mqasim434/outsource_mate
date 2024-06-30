@@ -338,20 +338,60 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen>
                                             ),
                                             trailing: InkWell(
                                                 onTap: () async {
-                                                  final directory =
-                                                      await getDownloadsDirectory();
-                                                  final taskId =
-                                                      await FlutterDownloader
-                                                          .enqueue(
-                                                    url:
-                                                        '${widget.project.files![index]['fileUrl']}',
-                                                    savedDir:
-                                                        '${directory!.path}/${widget.project.files![index]['fileName']}',
-                                                    showNotification:
-                                                        true, // show download progress in status bar (for Android)
-                                                    openFileFromNotification:
-                                                        true, // click on notification to open downloaded file (for Android)
-                                                  );
+                                                  try {
+                                                    final directory =
+                                                        await getApplicationDocumentsDirectory();
+                                                    if (directory == null) {
+                                                      // Handle the case where the directory could not be retrieved
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        SnackBar(
+                                                            content: Text(
+                                                                'Failed to get application documents directory')),
+                                                      );
+                                                      return;
+                                                    }
+
+                                                    final savedDir =
+                                                        directory.path;
+                                                    final fileUrl = widget
+                                                            .project
+                                                            .files![index]
+                                                        ['fileUrl'];
+                                                    final fileName = widget
+                                                            .project
+                                                            .files![index]
+                                                        ['fileName'];
+
+                                                    final taskId =
+                                                        await FlutterDownloader
+                                                            .enqueue(
+                                                      url: fileUrl.toString(),
+                                                      savedDir: savedDir,
+                                                      fileName: fileName,
+                                                      // showNotification: true, // show download progress in status bar (for Android)
+                                                      // openFileFromNotification: true, // click on notification to open downloaded file (for Android)
+                                                    );
+
+                                                    // Optional: Show success message or handle the task ID
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                          content: Text(
+                                                              'Download started for $fileName')),
+                                                    );
+                                                  } catch (e) {
+                                                    // Handle any errors that occur during the download process
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                          content: Text(
+                                                              'Error: $e')),
+                                                    );
+                                                  }
                                                 },
                                                 child: Icon(Icons.download)),
                                           );

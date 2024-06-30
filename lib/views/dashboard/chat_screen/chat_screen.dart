@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -29,20 +31,32 @@ class ChatScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(
-          onPressed: () {
-            userProvider.updateUserField(
-                fieldName: 'isOnline', newValue: false);
-            userProvider.updateUserField(
-                fieldName: 'isTyping', newValue: false);
-            Navigator.pop(context);
-          },
+        leading: Row(
+          children: [
+            BackButton(
+              onPressed: () {
+                userProvider.updateUserField(
+                    fieldName: 'isOnline', newValue: false);
+                userProvider.updateUserField(
+                    fieldName: 'isTyping', newValue: false);
+                Navigator.pop(context);
+              },
+            ),
+            otherUser.imageUrl != null
+                ? CircleAvatar(
+                    backgroundImage: NetworkImage(otherUser.imageUrl),
+                  )
+                : CircleAvatar(
+                    child: Icon(Icons.person),
+                  ),
+          ],
         ),
+        leadingWidth: 90,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              otherUser.email.toString(),
+              otherUser.name.toString(),
               style: const TextStyle(
                 color: Colors.black,
               ),
