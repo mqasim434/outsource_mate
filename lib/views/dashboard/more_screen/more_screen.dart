@@ -41,6 +41,13 @@ class MoreScreen extends StatelessWidget {
                   )
                 : SizedBox(),
             MoreScreenButtonWidget(
+              label: 'About',
+              icon: const Icon(Icons.person),
+              onTap: () {
+                Navigator.pushNamed(context, RouteName.aboutScreen);
+              },
+            ),
+            MoreScreenButtonWidget(
               label: 'Logout',
               icon: const Icon(Icons.logout),
               onTap: () {

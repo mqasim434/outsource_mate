@@ -10,6 +10,7 @@ import 'package:outsource_mate/providers/signin_provider.dart';
 import 'package:outsource_mate/res/myColors.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 import 'package:provider/provider.dart';
+import 'package:outsource_mate/services/notification_services.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -175,11 +176,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   maxY: 100,
                   minY: 0,
                   barGroups: projectProgressList.map((e) {
-                    // Access the first value in the map
                     int progress = e.values.first;
-                    // Use the index or a specific x value for BarChartGroupData
                     int xValue =
-                        progress; // or any other logic to assign x value
+                        progress;
                     return BarChartGroupData(
                       x: xValue,
                       barRods: [
@@ -212,7 +211,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       floatingActionButton:
           UserModel.currentUser.userType == UserRoles.CLIENT.name
               ? FloatingActionButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    // await NotificationServices.sendNotification(
+                    //   UserModel.currentUser.deviceToken.toString(),
+                    //   context,
+                    //   'This is a test Notification',
+                    //   'Test Notification',
+                    // );
                     Navigator.pushNamed(context, RouteName.addProjectScreen);
                   },
                   child: Icon(Icons.add),

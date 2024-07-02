@@ -270,10 +270,12 @@ class SignupScreen extends StatelessWidget {
                                         .signupWithEmail(emailController.text,
                                             passwordController.text, context)
                                         .then((value) {
-                                      // EmailService.sendSignupEmail(
-                                      //   emailController.text,
-                                      //   emailController.text,
-                                      // ).then((value) => null);
+                                      EmailService.sendMail(
+                                        receipentMail: emailController.text,
+                                        subject: 'Signup Alert From Outsource Mate',
+                                        mailMessage:
+                                            'You have successfully signed up for Outsource Mate as ${emailController.text}. Welcome to the productive world of Project Management.',
+                                      ).then((value) => null);
                                     });
                                   }
                                 },

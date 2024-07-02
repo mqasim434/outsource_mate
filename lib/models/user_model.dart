@@ -146,13 +146,13 @@ class FreelancerModel extends UserModel {
     }
     if (json['clientsList'] != null) {
       clientsList = [];
-      json['freelancersList'].forEach((value) {
+      json['clientsList'].forEach((value) {
         clientsList!.add(value);
       });
     }
     if (json['employeesList'] != null) {
       employeesList = [];
-      json['freelancersList'].forEach((value) {
+      json['employeesList'].forEach((value) {
         employeesList!.add(value);
       });
     }

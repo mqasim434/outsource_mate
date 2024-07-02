@@ -18,6 +18,8 @@ class RouteName {
   static const String inboxScreen = 'inbox';
 
   static const String moreScreen = 'more';
+  
+  static const String aboutScreen = 'about';
 
   static const String teamScreen = 'team';
 

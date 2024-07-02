@@ -1,11 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/signin_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:outsource_mate/services/notifications_services.dart';
+import 'package:outsource_mate/services/notification_services.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 
 class SignupProvider with ChangeNotifier {
@@ -39,7 +38,6 @@ class SignupProvider with ChangeNotifier {
       saveUserInDatabase(userCredential).then((value) {
         print('Successfully signed up: ${userCredential.user!.uid}');
         EasyLoading.dismiss();
-        OneSignal.login(email);
         Navigator.pushNamed(context, RouteName.completeYourProfile);
       });
     } catch (e) {
@@ -60,7 +58,9 @@ class SignupProvider with ChangeNotifier {
       final freelancer = FreelancerModel(
         email: userCredential.user!.email,
         userType: UserRoles.FREELANCER.name,
-        // deviceToken: await notificationServices.getDeviceToken(),
+        clientsList: [],
+        employeesList: [],
+        deviceToken: await NotificationServices.getDeviceToken(),
       );
       UserModel.currentUser = freelancer;
       final jsonData = freelancer.toJson();
@@ -73,7 +73,8 @@ class SignupProvider with ChangeNotifier {
       final client = ClientModel(
         email: userCredential.user!.email,
         userType: UserRoles.CLIENT.name,
-        // deviceToken: await notificationServices.getDeviceToken(),
+        freelancersList: [],
+        deviceToken: await NotificationServices.getDeviceToken(),
       );
       UserModel.currentUser = client;
       final jsonData = client.toJson();

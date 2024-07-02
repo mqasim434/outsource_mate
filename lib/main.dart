@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -22,16 +23,12 @@ import 'package:outsource_mate/res/components/switch_button_widget.dart';
 import 'package:outsource_mate/utils/consts.dart';
 import 'package:outsource_mate/utils/router.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-  OneSignal.initialize(ONESIGNAL_APP_ID);
-  OneSignal.Notifications.requestPermission(true);
   Gemini.init(apiKey: GEMINI_API_KEY);
   Stripe.publishableKey = STRIPER_PUBLISH_KEY;
   await FlutterDownloader.initialize(
@@ -41,6 +38,14 @@ void main() async {
           true // option: set to false to disable working with http links (default: false)
       );
   // await dotenv.load(fileName: ".env");
+  // requestNotificationPermission();
+  await FirebaseMessaging.instance.setAutoInitEnabled(true);
+  // FirebaseMessaging.onBackgroundMessage
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    if (message.notification != null) {
+      print('Message also contains a notification');
+    }
+  });
   runApp(const MyApp());
 }
 

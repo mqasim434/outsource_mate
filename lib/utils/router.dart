@@ -10,6 +10,7 @@ import 'package:outsource_mate/views/dashboard/dashboard.dart';
 import 'package:outsource_mate/views/dashboard/more_screen/more_screen.dart';
 import 'package:outsource_mate/views/dashboard/more_screen/profile_screen.dart';
 import 'package:outsource_mate/views/dashboard/more_screen/team_screen.dart';
+import 'package:outsource_mate/views/dashboard/more_screen/about_screen.dart';
 import 'package:outsource_mate/views/dashboard/notifications_screen.dart';
 import 'package:outsource_mate/views/dashboard/projects_screen.dart';
 import 'package:outsource_mate/views/intro_screen/intro_screen.dart';
@@ -46,6 +47,11 @@ class Routes {
       case RouteName.signupScreen:
         return MaterialPageRoute(
           builder: (_) => SignupScreen(),
+        );
+
+      case RouteName.aboutScreen:
+        return MaterialPageRoute(
+          builder: (_) => AboutPage(),
         );
 
       case RouteName.signinScreen:

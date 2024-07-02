@@ -91,15 +91,15 @@ class ClientProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> addEmailToClientsList(String newEmailToAdd) async {
+  Future<void> addEmailToClientsList(String freelancerEmail) async {
+    print(freelancerEmail);
     try {
       // Reference to the 'clients' collection in Firestore
       final clientsRef = FirebaseFirestore.instance.collection('freelancers');
 
       // Query to find the client document based on email
-      QuerySnapshot querySnapshot = await clientsRef
-          .where('email', isEqualTo: UserModel.currentUser.email)
-          .get();
+      QuerySnapshot querySnapshot =
+          await clientsRef.where('email', isEqualTo: freelancerEmail).get();
 
       if (querySnapshot.docs.isNotEmpty) {
         // Assuming there's only one client document per unique email (or handling if multiple found)
@@ -108,19 +108,19 @@ class ClientProvider extends ChangeNotifier {
         List<String> currentFreelancers =
             List<String>.from(clientSnapshot['clientsList']);
 
-        if (!currentFreelancers.contains(newEmailToAdd)) {
-          currentFreelancers.add(newEmailToAdd);
+        if (!currentFreelancers.contains(UserModel.currentUser.email)) {
+          currentFreelancers.add(UserModel.currentUser.email);
           await clientsRef
               .doc(clientSnapshot.id)
               .update({'clientsList': currentFreelancers});
 
           print('Email added to Clients list successfully.');
         } else {
-          print('Email $newEmailToAdd already exists in the Clients list.');
+          print('Email $freelancerEmail already exists in the Clients list.');
         }
       } else {
         print(
-            'Client document not found for email: ${UserModel.currentUser.email}');
+            'Freelancers document not found for email: ${UserModel.currentUser.email}');
       }
     } catch (e) {
       print('Error adding email to freelancers list: $e');

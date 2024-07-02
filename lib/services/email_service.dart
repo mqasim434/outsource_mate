@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 
 class EmailService {
   static Future<void> sendSignupEmail(
@@ -26,16 +28,23 @@ class EmailService {
       ),
     );
   }
-}
 
-//   static Future<void> sendEmail(
-//       String body, String subject, String receipentEmail) async {
-//     final Email email = Email(
-//       body: body,
-//       subject: subject,
-//       recipients: [receipentEmail],
-//       isHTML: false,
-//     );
-//     await FlutterEmailSender.send(email);
-//   }
-// }
+  static Future<void> sendMail(
+      { required String receipentMail,required String subject,required String mailMessage}) async {
+    String username = 'outsourcemate41@gmail.com';
+    String password = 'bmfl twnq oksp hizi';
+    final smtpServer = gmail(username, password);
+    final message = Message()
+      ..from = const Address('outsourcemate41@gmail.com')
+      ..recipients.add(receipentMail)
+      ..subject = subject
+      ..text = mailMessage;
+
+    try {
+      await send(message, smtpServer);
+      print('EMail Send successfully');
+    } catch (e) {
+      print(e);
+    }
+  }
+}

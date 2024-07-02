@@ -3,8 +3,6 @@ import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/bottom_navbar_provider.dart';
 import 'package:outsource_mate/providers/user_provider.dart';
 import 'package:outsource_mate/res/components/bottom_navbar.dart';
-import 'package:outsource_mate/services/notifications_services.dart';
-import 'package:outsource_mate/utils/routes_names.dart';
 import 'package:outsource_mate/views/dashboard/chat_screen/inbox_screen.dart';
 import 'package:outsource_mate/views/dashboard/dashboard_screen.dart';
 import 'package:outsource_mate/views/dashboard/more_screen/more_screen.dart';

@@ -161,7 +161,6 @@ class ProjectProvider extends ChangeNotifier {
       print(e.toString());
     } finally {
       EasyLoading.dismiss();
-      notifyListeners();
     }
   }
 

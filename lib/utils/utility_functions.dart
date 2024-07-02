@@ -21,12 +21,13 @@ class UtilityFunctions {
     }
   }
 
-  static DateTime calculateRemainingTime(DateTime startTime, DateTime deadline) {
+  static DateTime calculateRemainingTime(
+      DateTime startTime, DateTime deadline) {
     DateTime currentTime = DateTime.now();
-    DateTime remainingTime = DateTime.parse(deadline.difference(currentTime).toString());
+    DateTime remainingTime =
+        DateTime.parse(deadline.difference(currentTime).toString());
     return remainingTime;
   }
-
 
   static Future<String> uploadFileToFirebaseStorage(String filePath) async {
     print('Uploading file');
@@ -54,13 +55,18 @@ class UtilityFunctions {
     String? empId = json['empId'];
     String? password = json['password'];
     String? imageUrl = json['imageUrl'];
-    List<ProjectModel> projects = (json['projects'] as List)
-        .map((project) => ProjectModel.fromJson(project as Map<String, dynamic>))
+    List<ProjectModel> projects = (json['projects'] as List<dynamic>)
+        .map(
+            (project) => ProjectModel.fromJson(project as Map<String, dynamic>))
         .toList();
     String? userType = json['userType'];
     bool? isOnline = json['isOnline'];
     bool? isTyping = json['isTyping'];
     String? lastSeen = json['lastSeen'];
+    List<String> freelancersList = (json['freelancersList'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [];
 
     return EmployeeModel(
       name: name,
@@ -74,7 +80,8 @@ class UtilityFunctions {
       imageUrl: imageUrl,
       isOnline: isOnline,
       isTyping: isTyping,
-      lastSeen: lastSeen
+      lastSeen: lastSeen,
+      freelancersList: freelancersList,
     );
   }
 }

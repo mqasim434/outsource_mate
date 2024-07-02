@@ -11,7 +11,7 @@ import 'package:outsource_mate/providers/user_provider.dart';
 import 'package:outsource_mate/res/components/message_widget.dart';
 import 'package:outsource_mate/res/components/rounded_rectangular_button.dart';
 import 'package:outsource_mate/res/myColors.dart';
-import 'package:outsource_mate/services/onesignal_service.dart';
+import 'package:outsource_mate/services/notification_services.dart';
 import 'package:outsource_mate/utils/utility_functions.dart';
 import 'package:provider/provider.dart';
 
@@ -379,11 +379,12 @@ class ChatScreen extends StatelessWidget {
                               isDocument: false,
                             );
                             chatProvider.sendMessage(messageModel);
-
-                            OneSignalService.sendNotification(
-                                [UserModel.currentUser.email.toString()],
-                                messageModel.messageText.toString(),
-                                'New Message from ${UserModel.currentUser.email}}');
+                            NotificationServices.sendNotification(
+                              UserModel.currentUser.deviceToken,
+                              context,
+                              'This is a test Notification',
+                              'Test Notification',
+                            );
                             messageController.clear();
                           }
                         },

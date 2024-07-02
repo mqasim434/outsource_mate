@@ -438,7 +438,7 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
                                   .then((value) {
                                 clientProvider
                                     .addEmailToClientsList(
-                                        UserModel.currentUser.email)
+                                        freelancerEmail.toString())
                                     .then((value) {
                                   NotificationModel notificationModel =
                                       NotificationModel(

@@ -5,9 +5,11 @@ import 'package:outsource_mate/models/user_model.dart';
 import 'package:outsource_mate/providers/employee_provider.dart';
 import 'package:outsource_mate/providers/freelancersProvider.dart';
 import 'package:outsource_mate/providers/project_provider.dart';
+import 'package:outsource_mate/providers/signin_provider.dart';
 import 'package:outsource_mate/res/components/my_text_field.dart';
 import 'package:outsource_mate/res/components/rounded_rectangular_button.dart';
 import 'package:outsource_mate/res/myColors.dart';
+import 'package:outsource_mate/services/email_service.dart';
 import 'package:outsource_mate/utils/utility_functions.dart';
 import 'package:provider/provider.dart';
 
@@ -183,9 +185,17 @@ class TeamScreen extends StatelessWidget {
                                   email: emailController.text,
                                   phone: phoneController.text,
                                   position: roleController.text,
+                                  userType: UserRoles.EMPLOYEE.name,
+                                  freelancersList: [],
                                 );
                                 employeeProvider.createEmployee(
                                     newEmployee, context);
+                                EmailService.sendMail(
+                                    receipentMail: emailController.text,
+                                    subject:
+                                        'Employment Alert From Outsource Mate',
+                                    mailMessage:
+                                        '${UserModel.currentUser.email} added you as an Employee at Outsource Mate. Unlock your internal potential and prove your skills at Outsource Mate.\n Here are your credentials to login at Outsource Mate.\nEmployee Id: ${newEmployee.empId}\nPassword emp12345 .\nBest of Luck!\nBest Regards: Team Outsource Mate.');
                                 showDialog(
                                     context: context,
                                     builder: (context) {
@@ -353,7 +363,7 @@ class _TeamMemberWidgetState extends State<TeamMemberWidget> {
                             actions: [
                               RoundedRectangularButton(
                                   buttonText: 'Assign',
-                                  onPress: () {
+                                  onPress: () async {
                                     freelancersProvider
                                         .assignProjectToEmployee(
                                             widget.employeeModel.email
@@ -362,7 +372,19 @@ class _TeamMemberWidgetState extends State<TeamMemberWidget> {
                                                 projectProvider
                                                         .selectedProjectIndex
                                                     as int])
-                                        .then((value) {
+                                        .then((value) async {
+                                      await freelancersProvider
+                                          .addEmployeeEmailToFreelnacerList(
+                                              employeeEmail: widget
+                                                  .employeeModel.email
+                                                  .toString());
+                                      freelancersProvider
+                                          .addFreelancerEmailToEmployeeList(
+                                              freelancerEmail:
+                                                  UserModel.currentUser.email,
+                                              employeeEmail: widget
+                                                  .employeeModel.email
+                                                  .toString());
                                       Navigator.pop(context);
                                     });
                                   }),

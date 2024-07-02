@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:outsource_mate/models/user_model.dart';
+import 'package:outsource_mate/services/notification_services.dart';
 import 'package:outsource_mate/services/session_manager.dart';
 import 'package:outsource_mate/utils/routes_names.dart';
 import 'package:outsource_mate/utils/utility_functions.dart';
@@ -58,17 +58,16 @@ class SigninProvider extends ChangeNotifier {
                     password: password,
                     userRole: UserRoles.FREELANCER.name)
                 .then((value) async {
-              // final querySnapshot = await FirebaseFirestore.instance
-              //     .collection('freelancers')
-              //     .where('email', isEqualTo: email)
-              //     .get();
-              // for (final docSnapshot in querySnapshot.docs) {
-              //   await docSnapshot.reference.update({
-              //     'deviceToken': await notificationServices.getDeviceToken()
-              //   });
-              // }
-              // print(await notificationServices.getDeviceToken());
-              OneSignal.login(email);
+              final querySnapshot = await FirebaseFirestore.instance
+                  .collection('freelancers')
+                  .where('email', isEqualTo: email)
+                  .get();
+              for (final docSnapshot in querySnapshot.docs) {
+                await docSnapshot.reference.update({
+                  'deviceToken': await NotificationServices.getDeviceToken()
+                });
+              }
+              print(await NotificationServices.getDeviceToken());
               Navigator.pushNamed(context, RouteName.dashboard);
             });
           } else if (currentRoleSelected == UserRoles.CLIENT) {
@@ -78,20 +77,19 @@ class SigninProvider extends ChangeNotifier {
                     password: password,
                     userRole: UserRoles.CLIENT.name)
                 .then((value) async {
-              // final querySnapshot = await FirebaseFirestore.instance
-              //     .collection('clients')
-              //     .where('email', isEqualTo: email)
-              //     .get();
-              // for (final docSnapshot in querySnapshot.docs) {
-              //   await docSnapshot.reference.update({
-              //     'deviceToken': await notificationServices.getDeviceToken()
-              //   });
-              // }
+              final querySnapshot = await FirebaseFirestore.instance
+                  .collection('clients')
+                  .where('email', isEqualTo: email)
+                  .get();
+              for (final docSnapshot in querySnapshot.docs) {
+                await docSnapshot.reference.update({
+                  'deviceToken': await NotificationServices.getDeviceToken()
+                });
+              }
               Navigator.pushNamed(context, RouteName.dashboard);
             });
           }
           notifyListeners();
-          OneSignal.login(email);
           return value;
         });
       } else {
@@ -139,15 +137,14 @@ class SigninProvider extends ChangeNotifier {
             password: password,
             userRole: UserRoles.CLIENT.name,
           );
-          // final querySnapshot = await FirebaseFirestore.instance
-          //     .collection('employees')
-          //     .where('empId', isEqualTo: employeeId)
-          //     .get();
-          // for (final docSnapshot in querySnapshot.docs) {
-          //   await docSnapshot.reference
-          //       .update({'token': await notificationServices.getDeviceToken()});
-          // }
-          OneSignal.login(employeeId);
+          final querySnapshot = await FirebaseFirestore.instance
+              .collection('employees')
+              .where('empId', isEqualTo: employeeId)
+              .get();
+          for (final docSnapshot in querySnapshot.docs) {
+            await docSnapshot.reference
+                .update({'token': await NotificationServices.getDeviceToken()});
+          }
           return true;
         } else {
           EasyLoading.dismiss();
