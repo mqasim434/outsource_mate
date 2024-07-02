@@ -8,6 +8,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:outsource_mate/providers/bottom_navbar_provider.dart';
 import 'package:outsource_mate/providers/chat_provider.dart';
 import 'package:outsource_mate/providers/client_provider.dart';
+import 'package:feature_discovery/feature_discovery.dart';
 import 'package:outsource_mate/providers/custom_timer_provider.dart';
 import 'package:outsource_mate/providers/freelancersProvider.dart';
 import 'package:outsource_mate/providers/notifications_provider.dart';
@@ -72,17 +73,19 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CustomTimerProvider()),
         ChangeNotifierProvider(create: (_) => NotificationsProvider()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        checkerboardOffscreenLayers: true,
-        theme: ThemeData(
-          scaffoldBackgroundColor: Colors.white,
+      child: FeatureDiscovery(
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Flutter Demo',
+          checkerboardOffscreenLayers: true,
+          theme: ThemeData(
+            scaffoldBackgroundColor: Colors.white,
+          ),
+          builder: EasyLoading.init(),
+          initialRoute: RouteName.splashScreen,
+          // home: IntroScreen(),
+          onGenerateRoute: Routes.generateRoute,
         ),
-        builder: EasyLoading.init(),
-        initialRoute: RouteName.splashScreen,
-        // home: IntroScreen(),
-        onGenerateRoute: Routes.generateRoute,
       ),
     );
   }

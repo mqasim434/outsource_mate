@@ -89,7 +89,7 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const SizedBox(),
-            Image.asset('assets/logo/logo.png'),
+            Image.asset('assets/logo/logo_new.png'),
             Container(
               height: screenHeight * 0.05,
               width: screenWidth * 0.8,

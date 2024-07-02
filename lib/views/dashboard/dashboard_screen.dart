@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+import 'package:feature_discovery/feature_discovery.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:outsource_mate/models/project_model.dart';
@@ -52,6 +53,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _loadProjects().then((value) {
       getProgressList();
     });
+    FeatureDiscovery.discoverFeatures(
+      context,
+      const <String>{
+        // Feature ids for every feature that you want to showcase in order.
+        'ft_1',
+      },
+    );
+    FeatureDiscovery.clearPreferences(
+      context,
+      <String>{
+        'ft_1',
+      },
+    );
   }
 
   Future<void> _loadProjects() async {
@@ -177,8 +191,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   minY: 0,
                   barGroups: projectProgressList.map((e) {
                     int progress = e.values.first;
-                    int xValue =
-                        progress;
+                    int xValue = progress;
                     return BarChartGroupData(
                       x: xValue,
                       barRods: [
@@ -210,17 +223,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       floatingActionButton:
           UserModel.currentUser.userType == UserRoles.CLIENT.name
-              ? FloatingActionButton(
-                  onPressed: () async {
-                    // await NotificationServices.sendNotification(
-                    //   UserModel.currentUser.deviceToken.toString(),
-                    //   context,
-                    //   'This is a test Notification',
-                    //   'Test Notification',
-                    // );
-                    Navigator.pushNamed(context, RouteName.addProjectScreen);
-                  },
-                  child: Icon(Icons.add),
+              ? DescribedFeatureOverlay(
+                  featureId: 'ft_1',
+                  tapTarget: Icon(Icons.add),
+                  title: Text('Create Project'),
+                  description: Text(
+                      'Click this + icon to create e new project, assign it to freelancer and make payment.'),
+                  textColor: Colors.white,
+                  overflowMode: OverflowMode.clipContent,
+                  contentLocation: ContentLocation.above,
+                  backgroundColor: MyColors.pinkColor,
+                  child: FloatingActionButton(
+                    onPressed: () async {
+                      // await NotificationServices.sendNotification(
+                      //   UserModel.currentUser.deviceToken.toString(),
+                      //   context,
+                      //   'This is a test Notification',
+                      //   'Test Notification',
+                      // );
+                      Navigator.pushNamed(context, RouteName.addProjectScreen);
+                    },
+                    child: Icon(Icons.add),
+                  ),
                 )
               : SizedBox(),
     );
